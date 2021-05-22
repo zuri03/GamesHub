@@ -1,8 +1,31 @@
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect
+} from "react-router-dom";
+
 import logo from './logo.svg';
 import './App.css';
 
 function App() {
   return (
+    <div className="App">
+      <header className="App-header"> GamesHub! 
+      </header>
+      <body className="App-body">
+        <Router>
+          <Switch>
+          <Route path="/Checkers">
+            
+        <img src="https://www.seekpng.com/png/detail/232-2328978_icon-checkers-icon.png" alt="CHECKERS"
+          className="Checkers-logo"></img>
+          </Route>
+          </Switch>
+        </Router>
+      </body>
+    </div>
+    /*
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
@@ -19,6 +42,7 @@ function App() {
         </a>
       </header>
     </div>
+    */
   );
 }
 
