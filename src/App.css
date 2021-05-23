@@ -7,6 +7,39 @@
   pointer-events: none;
 }
 
+.Checkers-whiteSpace {
+  background: #fff;
+  border: 1px solid rgb(65, 64, 64);
+  float: none;
+  font-size: 24px;
+  font-weight: bold;
+  line-height: 34px;
+  height: 34px;
+  margin-right: -1px;
+  margin-top: -1px;
+  padding: 0;
+  text-align: center;
+  width: 34px;
+}
+.Checkers-blackSpace {
+  background: rgb(0, 0, 0);
+  border: 1px solid rgb(65, 64, 64);
+  float: none;
+  font-size: 24px;
+  font-weight: bold;
+  line-height: 34px;
+  height: 34px;
+  margin-right: -1px;
+  margin-top: -1px;
+  padding: 0;
+  text-align: center;
+  width: 34px;
+}
+.Checkers-row {
+   vertical-align: top;
+   display: inline-block;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;

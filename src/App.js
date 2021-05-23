@@ -7,7 +7,9 @@ import {
 
 import logo from './logo.svg';
 import './App.css';
+import Checkers from './Checkers.js';
 
+const img = "https://www.seekpng.com/png/detail/232-2328978_icon-checkers-icon.png"
 function App() {
   return (
     <div className="App">
@@ -17,9 +19,7 @@ function App() {
         <Router>
           <Switch>
           <Route path="/Checkers">
-            
-        <img src="https://www.seekpng.com/png/detail/232-2328978_icon-checkers-icon.png" alt="CHECKERS"
-          className="Checkers-logo"></img>
+            <Checkers />
           </Route>
           </Switch>
         </Router>
