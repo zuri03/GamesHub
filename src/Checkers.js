@@ -1,11 +1,36 @@
 import React, {Component} from 'react';
 
-function Space(props) {
+class Space extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            currentPiece : null,
+            spaceColor : this.props.spaceColor,
+            index : this.props.index
+        }
+    }
+
+    //gotta fix, add event and target
+    addPiece(piece) {
+        this.setState ({
+            currentPiece : piece
+        })
+    }
+
+    render(){
+        return (
+            <button className={this.state.spaceColor}>{this.state.index}</button>   
+        );
+    }
+}
+
+function Piece(props){
     return (
-        <button className={props.spaceColor}>{props.index}</button>   
+       <button className="Checkers-piece"></button>
     );
 }
-class Checkers extends React.Component {
+class Board extends React.Component {
 
     constructor(props){
         super(props);
@@ -14,18 +39,18 @@ class Checkers extends React.Component {
             spaces : Array(8).fill(null).map(() => rows.slice())
         };
         
-        var color;
+        var color = 0;
         for(var i = 0; i < this.state.spaces.length; i++){
+
             color = (i % 2) === 0 ? 1 : 0;
+
             for(var j = 0; j < this.state.spaces.length; j++){
                 if(color === 0){
-                    this.state.spaces[i][j] = <Space spaceColor="Checkers-whiteSpace" index={i} />
+                    this.state.spaces[i][j] = <Space spaceColor="Checkers-whiteSpace" index={i + ", " + j} />
                     color++;
                 } else if (color === 1){
-                    this.state.spaces[i][j] = <Space spaceColor="Checkers-blackSpace" index={i} />
+                    this.state.spaces[i][j] = <Space spaceColor="Checkers-blackSpace" index={i + ", " + j} />
                     color--;
-                } else {
-                    console.log("Error color = " + color)
                 }
             }
         }
@@ -33,7 +58,7 @@ class Checkers extends React.Component {
 
     render() {
         return (
-            <div className="Checkers-Board">
+            <div className="Checkers-board">
                 <div className="Checkers-row">
                     {this.state.spaces[0]}
                 </div>
@@ -60,6 +85,29 @@ class Checkers extends React.Component {
                 </div>
             </div>
         );
+    }
+}
+
+
+class Checkers extends React.Component {
+    constructor(props){
+        super(props);
+        this.state = {
+            
+        }
+    }
+
+    render(){
+        return(
+            <div className="Checkers-game">
+                <header className="Checkers-header">
+                    CHECKERS!!!!!
+                </header>
+                <body>
+                    <Board/>
+                </body>
+            </div>
+        )
     }
 }
 
