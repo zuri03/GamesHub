@@ -5,7 +5,7 @@ class Space extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            currentPiece : null,
+            currentPiece : this.props.piece,
             spaceColor : this.props.spaceColor,
             index : this.props.index
         }
@@ -20,7 +20,7 @@ class Space extends React.Component {
 
     render(){
         return (
-            <button className={this.state.spaceColor}>{this.state.index}</button>   
+            <div className={this.state.spaceColor}>{this.state.currentPiece}</div>   
         );
     }
 }
@@ -46,14 +46,21 @@ class Board extends React.Component {
 
             for(var j = 0; j < this.state.spaces.length; j++){
                 if(color === 0){
-                    this.state.spaces[i][j] = <Space spaceColor="Checkers-whiteSpace" index={i + ", " + j} />
+                    this.state.spaces[i][j] = <Space spaceColor="Checkers-whiteSpace" index={i + ", " + j}/>
                     color++;
-                } else if (color === 1){
-                    this.state.spaces[i][j] = <Space spaceColor="Checkers-blackSpace" index={i + ", " + j} />
+                } else {
+                    if(i <= 2){
+                        this.state.spaces[i][j] = <Space spaceColor="Checkers-blackSpace" index={i + ", " + j} piece={<Piece/>}/>
+                    } else if (i >= 5) {
+                        this.state.spaces[i][j] = <Space spaceColor="Checkers-blackSpace" index={i + ", " + j} piece={<Piece/>}/>
+                    } else {
+                        this.state.spaces[i][j] = <Space spaceColor="Checkers-blackSpace" index={i + ", " + j} piece={null}/>
+                    }
                     color--;
                 }
             }
         }
+
     }
 
     render() {
@@ -62,32 +69,31 @@ class Board extends React.Component {
                 <div className="Checkers-row">
                     {this.state.spaces[0]}
                 </div>
-                <div className="Checkers-Row">
+                <div className="Checkers-row">
                     {this.state.spaces[1]}
                 </div>
-                <div className="Checkers-Row">
+                <div className="Checkers-row">
                     {this.state.spaces[2]}
                 </div>
                 <div className="Checkers-row">
                     {this.state.spaces[3]}
                 </div>
-                <div className="Checkers-Row">
+                <div className="Checkers-row">
                     {this.state.spaces[4]}
                 </div>
-                <div className="Checkers-Row">
+                <div className="Checkers-row">
                     {this.state.spaces[5]}
                 </div>
-                <div className="Checkers-Row">
+                <div className="Checkers-row">
                     {this.state.spaces[6]}
                 </div>
-                <div className="Checkers-Row">
+                <div className="Checkers-row">
                     {this.state.spaces[7]}
                 </div>
             </div>
         );
     }
 }
-
 
 class Checkers extends React.Component {
     constructor(props){
@@ -101,7 +107,7 @@ class Checkers extends React.Component {
         return(
             <div className="Checkers-game">
                 <header className="Checkers-header">
-                    CHECKERS!!!!!
+                    CHECKERS!
                 </header>
                 <body>
                     <Board/>
