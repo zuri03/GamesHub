@@ -15,7 +15,6 @@ function App() {
     <div className="App">
       <header className="App-header"> GamesHub! 
       </header>
-      <body className="App-body">
         <Router>
           <Switch>
           <Route path="/Checkers">
@@ -23,7 +22,6 @@ function App() {
           </Route>
           </Switch>
         </Router>
-      </body>
     </div>
     /*
     <div className="App">
