@@ -7,11 +7,19 @@
   pointer-events: none;
 }
 
-.Checkers-piece {
+.Checkers-pieceRed {
   display: inline-block;
   width: 40px;
   height: 40px;
-  background: rgb(38, 0, 255);
+  background: rgb(255, 0, 0);
+  border-radius: 50%;
+}
+
+.Checkers-pieceWhite {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  background: rgb(255, 255, 255);
   border-radius: 50%;
 }
 .Checkers-whiteSpace {
