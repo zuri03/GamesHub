@@ -7,7 +7,7 @@ import {
 
 import logo from './logo.svg';
 import './App.css';
-import Checkers from './Checkers.js';
+import Checkers from './Checkers/Checkers.js';
 
 const img = "https://www.seekpng.com/png/detail/232-2328978_icon-checkers-icon.png"
 function App() {
