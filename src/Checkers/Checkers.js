@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import validateMove from './Referee.js';
 
 function Space(props) {
     return (
@@ -106,11 +107,17 @@ class Board extends React.Component {
         } else {
             //since set state is asynchronous I ran into issues with updating the end property, the await statement fixed that
             if(this.state.dictionary[id] === null){
+                
+                console.log('Before Validate:\n ' + 'start: ' + this.state.start + '\n end: ' + this.state.end);
                 await this.setState({
                     end: id,
                     message: null
                 });
-                this.movePiece();
+                if(validateMove(this.state.start, this.state.end)){
+                    this.movePiece();
+                } else {
+                    this.setState({message: 'Illegal Move'})
+                }
             } else {
                 this.setState({message: 'Cannot place piece here this space is full'});
             }
