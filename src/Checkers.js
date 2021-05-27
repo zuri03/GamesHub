@@ -1,21 +1,11 @@
 import React, {Component} from 'react';
 
-class Space extends React.Component {
-    constructor(props) {
-        super(props);
-        this.props = props;
-        this.state = {
-            id: props.id,
-            piece: props.piece
-        }
-    }
-    render() {
-        return (
-            <div id={this.state.id} className={this.props.spaceColor} onClick={(id, piece) => this.props.handleClick(this.state.id, this.state.piece)}> 
-                {this.props.piece}
-            </div>   
-        );  
-    }  
+function Space(props) {
+    return (
+        <div id={props.id} className={props.spaceColor} onClick={(id, piece) => props.handleClick(props.id, props.piece)}> 
+            {props.piece}
+        </div>   
+    );
 }
 
 function Piece(props){
@@ -33,16 +23,14 @@ class Board extends React.Component {
         const rows = Array(8).fill(null);
         this.state = {
             spaces : Array(8).fill(null).map(() => rows.slice()),
-            pieces: [],
             start: null,//first click
             end: null,//second click
-            message: null,
+            message: null,//lets the player know if a move was successful or if they have made a mistake
             dictionary: {},
         };
         
         var color = 0;
         var pieceIndex = 0;
-        var spaceIndex = 0;
         
         for(var i = 0; i < this.state.spaces.length; i++){
 
@@ -56,7 +44,7 @@ class Board extends React.Component {
                     this.state.spaces[i][j] = <Space 
                         id={i + "," + j}  
                         spaceColor="Checkers-whiteSpace" 
-                        handleClick={(id, piece, key) => this.handleClick(id, piece, key)}
+                        handleClick={(id, piece) => this.handleClick(id, piece)}
                         piece={null}
                     />;
                     this.state.dictionary[i + "," + j] = null;
@@ -66,12 +54,11 @@ class Board extends React.Component {
                     if(i <= 2){
 
                         piece = <Piece id={pieceIndex} pieceColor="Checkers-pieceRed"/>;
-                        this.state.pieces.push(piece);
                         this.state.dictionary[i + "," + j] = piece;
                         this.state.spaces[i][j] = <Space 
                             id={i + "," + j}  
                             spaceColor="Checkers-blackSpace" 
-                            handleClick={(id, piece, key) => this.handleClick(id, piece, key)} 
+                            handleClick={(id, piece) => this.handleClick(id, piece)} 
                             piece={this.state.dictionary[i + "," + j]}
                         />;
                         pieceIndex++;
@@ -80,30 +67,27 @@ class Board extends React.Component {
                     } else if (i >= 5) {
 
                         piece = <Piece id={pieceIndex} pieceColor="Checkers-pieceWhite"/>
-                        this.state.pieces.push(piece);
                         this.state.dictionary[i + "," + j] = piece;
                         this.state.spaces[i][j] = <Space 
                             id={i + "," + j} 
                             spaceColor="Checkers-blackSpace" 
-                            handleClick={(id, piece, key) => this.handleClick(id, piece, key)}
+                            handleClick={(id, piece) => this.handleClick(id, piece)}
                             piece={this.state.dictionary[i + "," + j]}
                         />;
                         pieceIndex++;
                         
-
                     } else {
 
                         this.state.dictionary[i + "," + j] = null;
                         this.state.spaces[i][j] = <Space 
                             id={i + "," + j}  
                             spaceColor="Checkers-blackSpace" 
-                            handleClick={(id, piece, key) => this.handleClick(id, piece, key)} 
+                            handleClick={(id, piece) => this.handleClick(id, piece)} 
                             piece={null}
                         />;   
                     }
                     color--;
                 }
-                spaceIndex++;
             }
         }
     }
@@ -120,7 +104,7 @@ class Board extends React.Component {
                 });
             }
         } else {
-            
+            //since set state is asynchronous I ran into issues with updating the end property, the await statement fixed that
             if(this.state.dictionary[id] === null){
                 await this.setState({
                     end: id,
@@ -134,30 +118,36 @@ class Board extends React.Component {
     }
     
     movePiece(){
-        console.log('Indexes: ' + this.state.start.split(','));
-        var newSpaces = this.state.spaces;
+        //When attempting to move the same piece twice I get the screenshotted error
+        var startIndex = this.state.start.split(',');
+        var endIndex = this.state.end.split(',');
+        var movingPiece = this.state.dictionary[startIndex];
+        var udpatedSpace = this.state.spaces;
+        var updatedDiction = this.state.dictionary;
 
-        newSpaces[this.state.end.split(',')[0]][this.state.end.split(',')[1]] = null
-        newSpaces[this.state.end.split(',')[0]][this.state.end.split(',')[1]] = <Space 
+        udpatedSpace[endIndex[0]][endIndex[1]] = null
+        udpatedSpace[endIndex[0]][endIndex[1]] = <Space 
             id={this.state.end} 
             spaceColor="Checkers-blackSpace" 
             handleClick={(id, piece) => this.handleClick(id, piece)} 
             piece={this.state.dictionary[this.state.start.split(',')]}
         />;
-        this.state.dictionary[this.state.end] = this.state.dictionary[this.state.start];
-        newSpaces[this.state.start.split(',')[0]][this.state.start.split(',')[1]] = null
-        newSpaces[this.state.start.split(',')[0]][this.state.start.split(',')[1]] = <Space 
+
+        updatedDiction[this.state.end] = this.state.dictionary[this.state.start];
+        udpatedSpace[startIndex[0]][startIndex[1]] = null
+        udpatedSpace[startIndex[0]][startIndex[1]] = <Space 
             id={this.state.start}  
             spaceColor="Checkers-blackSpace" 
             handleClick={(id, piece) => this.handleClick(id, piece)} 
             piece={null}
         />;
-        this.state.dictionary[this.state.start] = null;
+
+        updatedDiction[this.state.start] = null;
+        updatedDiction[this.state.end] = movingPiece;
+        
         this.setState({
-            spaces: newSpaces
-        })
-        this.forceUpdate();
-        this.setState({
+            spaces: udpatedSpace,
+            dictionary: updatedDiction,
             start: null,
             end: null,
         });                      
