@@ -1,43 +1,29 @@
 import React, {Component} from 'react';
 
 class Space extends React.Component {
-
     constructor(props) {
         super(props);
+        this.props = props;
         this.state = {
-            id: this.props.id,
-            currentPiece : this.props.piece,
-            spaceColor : this.props.spaceColor,
-            index : this.props.index
+            id: props.id,
+            piece: props.piece
         }
-        this.getCurrentPiece = this.getCurrentPiece.bind(this);
     }
-
-    //gotta fix, add event and target
-    addPiece(piece) {
-        this.setState ({
-            currentPiece : piece
-        })
-    }
-
-    getCurrentPiece(){
-        return this.state.currentPiece;
-    }
-
-    render(){
+    render() {
         return (
-            <div id={this.state.id} className={this.state.spaceColor} onClick={(id, piece) => this.props.handleClick(this.state.id, this.state.currentPiece)}>
-                {this.state.currentPiece}
+            <div id={this.state.id} className={this.props.spaceColor} onClick={(id, piece) => this.props.handleClick(this.state.id, this.state.piece)}> 
+                {this.props.piece}
             </div>   
-        );
-    }
+        );  
+    }  
 }
 
 function Piece(props){
     return (
-       <button className={props.pieceColor} onDragStart={props.drag} draggable="true"></button>
+       <button className={props.pieceColor}/>
     );
 }
+
 class Board extends React.Component {
 
     constructor(props){
@@ -47,36 +33,73 @@ class Board extends React.Component {
         const rows = Array(8).fill(null);
         this.state = {
             spaces : Array(8).fill(null).map(() => rows.slice()),
+            pieces: [],
             start: null,//first click
             end: null,//second click
             message: null,
+            dictionary: {},
         };
-
-        this.drag = this.drag.bind(this);
         
         var color = 0;
         var pieceIndex = 0;
         var spaceIndex = 0;
+        
         for(var i = 0; i < this.state.spaces.length; i++){
 
+            var piece;
             color = (i % 2) === 0 ? 1 : 0;
 
             for(var j = 0; j < this.state.spaces.length; j++){
+                
                 if(color === 0){
-                    this.state.spaces[i][j] = <Space id={i + "," + j} key={spaceIndex} spaceColor="Checkers-whiteSpace" handleClick={(id, piece) => this.handleClick(id, piece)}/>
+
+                    this.state.spaces[i][j] = <Space 
+                        id={i + "," + j}  
+                        spaceColor="Checkers-whiteSpace" 
+                        handleClick={(id, piece, key) => this.handleClick(id, piece, key)}
+                        piece={null}
+                    />;
+                    this.state.dictionary[i + "," + j] = null;
                     color++;
+                    
                 } else {
                     if(i <= 2){
-                        this.state.spaces[i][j] = <Space id={i + "," + j} key={spaceIndex} spaceColor="Checkers-blackSpace" handleClick={(id, piece) => this.handleClick(id, piece)}
-                            piece={<Piece id={pieceIndex} pieceColor="Checkers-pieceRed"/>}/>
+
+                        piece = <Piece id={pieceIndex} pieceColor="Checkers-pieceRed"/>;
+                        this.state.pieces.push(piece);
+                        this.state.dictionary[i + "," + j] = piece;
+                        this.state.spaces[i][j] = <Space 
+                            id={i + "," + j}  
+                            spaceColor="Checkers-blackSpace" 
+                            handleClick={(id, piece, key) => this.handleClick(id, piece, key)} 
+                            piece={this.state.dictionary[i + "," + j]}
+                        />;
                         pieceIndex++;
+                        
+
                     } else if (i >= 5) {
-                        this.state.spaces[i][j] = <Space id={i + "," + j} key={spaceIndex} spaceColor="Checkers-blackSpace" handleClick={(id, piece) => this.handleClick(id, piece)}
-                            piece={<Piece id={pieceIndex} pieceColor="Checkers-pieceWhite"/>}/>
+
+                        piece = <Piece id={pieceIndex} pieceColor="Checkers-pieceWhite"/>
+                        this.state.pieces.push(piece);
+                        this.state.dictionary[i + "," + j] = piece;
+                        this.state.spaces[i][j] = <Space 
+                            id={i + "," + j} 
+                            spaceColor="Checkers-blackSpace" 
+                            handleClick={(id, piece, key) => this.handleClick(id, piece, key)}
+                            piece={this.state.dictionary[i + "," + j]}
+                        />;
                         pieceIndex++;
+                        
+
                     } else {
-                        this.state.spaces[i][j] = <Space id={i + "," + j} key={spaceIndex} spaceColor="Checkers-blackSpace" handleClick={(id, piece) => this.handleClick(id, piece)} 
-                            piece={null}/>
+
+                        this.state.dictionary[i + "," + j] = null;
+                        this.state.spaces[i][j] = <Space 
+                            id={i + "," + j}  
+                            spaceColor="Checkers-blackSpace" 
+                            handleClick={(id, piece, key) => this.handleClick(id, piece, key)} 
+                            piece={null}
+                        />;   
                     }
                     color--;
                 }
@@ -85,52 +108,59 @@ class Board extends React.Component {
         }
     }
 
-    handleClick(id, piece){
-
-        console.log('Space id: ' + id);
-        var space = this.state.spaces[id.split(',')[0]][id.split(',')[1]]
-
+    async handleClick(id, piece){
+        
         if(this.state.start === null){
-
             if(piece === null){
-                this.setState({message: 'this space does not have a piece'})
+                this.setState({message: 'this space does not have a piece'});
             } else {
-                this.setState({
-                    start: space,
+                await this.setState({
+                    start: id,
                     message: null
-                })
+                });
             }
-            
         } else {
-            if(piece === null){
-                console.log('end: ' + id)
-                this.setState({
+            
+            if(this.state.dictionary[id] === null){
+                await this.setState({
                     end: id,
                     message: null
-                })
-                this.moveMade();
+                });
+                this.movePiece();
             } else {
-                this.setState({message: 'Cannot place piece here this space is full'})
+                this.setState({message: 'Cannot place piece here this space is full'});
             }
-        }    
+        }   
     }
-
-    moveMade(){
-        /*
-        if(isValidMove()){
-
-        } else {
-            return false;
-        }
-        */
-    }
-    drag(e) {
-        e.dataTransfer.setData("Piece", e.target.id);
-        console.log(e.target.id);
-    }
-
+    
     movePiece(){
-        
+        console.log('Indexes: ' + this.state.start.split(','));
+        var newSpaces = this.state.spaces;
+
+        newSpaces[this.state.end.split(',')[0]][this.state.end.split(',')[1]] = null
+        newSpaces[this.state.end.split(',')[0]][this.state.end.split(',')[1]] = <Space 
+            id={this.state.end} 
+            spaceColor="Checkers-blackSpace" 
+            handleClick={(id, piece) => this.handleClick(id, piece)} 
+            piece={this.state.dictionary[this.state.start.split(',')]}
+        />;
+        this.state.dictionary[this.state.end] = this.state.dictionary[this.state.start];
+        newSpaces[this.state.start.split(',')[0]][this.state.start.split(',')[1]] = null
+        newSpaces[this.state.start.split(',')[0]][this.state.start.split(',')[1]] = <Space 
+            id={this.state.start}  
+            spaceColor="Checkers-blackSpace" 
+            handleClick={(id, piece) => this.handleClick(id, piece)} 
+            piece={null}
+        />;
+        this.state.dictionary[this.state.start] = null;
+        this.setState({
+            spaces: newSpaces
+        })
+        this.forceUpdate();
+        this.setState({
+            start: null,
+            end: null,
+        });                      
     }
 
     render() {
@@ -160,7 +190,7 @@ class Board extends React.Component {
                 <div className="Checkers-row">
                     {this.state.spaces[7]}
                 </div>
-                <footer>{this.state.start} + {this.state.message}</footer>
+                <footer>{this.state.start} + {this.state.message} + {this.state.end}</footer>
             </div>
         );
     }
