@@ -15,7 +15,7 @@ function Space(props) {
 
 function Piece(props){
     return (
-       <button className={props.pieceColor}/>
+       <button className={props.class} pieceColor={props.pieceColor}/>
     );
 }
 
@@ -60,7 +60,7 @@ class Board extends React.Component {
                 } else {
                     if(i <= 2){
 
-                        piece = <Piece id={pieceIndex} pieceColor="Checkers-pieceRed"/>;
+                        piece = <Piece id={pieceIndex} class="Checkers-pieceRed" pieceColor={"RED"}/>;
                         this.state.dictionary[i + "," + j] = piece;
                         this.state.spaces[i][j] = <Space 
                             id={i + "," + j}  
@@ -74,7 +74,7 @@ class Board extends React.Component {
 
                     } else if (i >= 5) {
 
-                        piece = <Piece id={pieceIndex} pieceColor="Checkers-pieceWhite"/>
+                        piece = <Piece id={pieceIndex} class="Checkers-pieceWhite" pieceColor={"WHITE"}/>
                         this.state.dictionary[i + "," + j] = piece;
                         this.state.spaces[i][j] = <Space 
                             id={i + "," + j} 
@@ -139,7 +139,6 @@ class Board extends React.Component {
     getDiagonalPiece(){
         var gapIndex = [];
         
-        console.log('Coordinates:  \n ' + 'Start: ' + this.state.start + '\n End: ' + this.state.end);
         this.state.start.split(',')[0] > this.state.end.split(',')[0] ? //condition 
             gapIndex.push((parseInt(this.state.start.split(',')[0]) - 1).toString()) ://true
             gapIndex.push((parseInt(this.state.start.split(',')[0]) + 1).toString());//false
@@ -147,10 +146,7 @@ class Board extends React.Component {
         this.state.start.split(',')[1] > this.state.end.split(',')[1] ? //condition 
             gapIndex.push((parseInt(this.state.start.split(',')[1]) - 1).toString()) ://true
             gapIndex.push((parseInt(this.state.start.split(',')[1]) + 1).toString());//false
-        
-        console.log('Array: ' + gapIndex);
-        console.log('Diag Indexes: ' + gapIndex.join());
-        //console.log('Returned Pice: ' + this.state.dictionary[gapIndex.join()])
+      
         return this.state.dictionary[gapIndex.join()];
     }
     
