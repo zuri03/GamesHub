@@ -1,12 +1,12 @@
-import React, {Component} from 'react';
-import isValidMove from './Referee.js';
+import React from 'react';
 
 function Space(props) {
     return (
         <div 
-            id={props.id} 
+            id={props.id}
+            key={props.id} 
             className={props.spaceColor} 
-            onClick={(id, piece) => props.handleClick(props.id, props.piece)}
+            onClick={(id) => props.handleClick(props.id)}
             onDoubleClick={props.handleDoubleClick}> 
             {props.piece}
         </div>   
@@ -15,7 +15,7 @@ function Space(props) {
 
 function Piece(props){
     return (
-       <button className={props.class} pieceColor={props.pieceColor}/>
+       <button className={props.class} key={props.id}/>
     );
 }
 
@@ -28,16 +28,33 @@ class Board extends React.Component {
         const rows = Array(8).fill(null);
         this.state = {
             spaces : Array(8).fill(null).map(() => rows.slice()),
-            start: null,//first click
-            end: null,//second click
-            message: null,//lets the player know if a move was successful or if they have made a mistake
+            start: null,
+            end: null,
+            message: null,
             dictionary: {},
         };
 
         this.handleDoubleClick = this.handleDoubleClick.bind(this);
+        this.isValidMove = this.props.isValidMove;
         
         var color = 0;
         var pieceIndex = 0;
+
+        class Space {
+            constructor(id, piece, color){
+                this.id = id;
+                this.piece = piece;
+                this.color = color;
+            }
+        }
+
+        class Piece {
+            constructor(id, pieceColor){
+                this.id = id;
+                this.pieceColor = pieceColor;
+            }
+        }
+
         
         for(var i = 0; i < this.state.spaces.length; i++){
 
@@ -47,54 +64,32 @@ class Board extends React.Component {
             for(var j = 0; j < this.state.spaces.length; j++){
                 
                 if(color === 0){
-
-                    this.state.spaces[i][j] = <Space 
-                        id={i + "," + j}  
-                        spaceColor="Checkers-whiteSpace" 
-                        handleClick={(id, piece) => this.handleClick(id, piece)}
-                        piece={null}
-                    />;
+                    
+                    this.state.spaces[i][j] = new Space((i + "," + j), null, "WHITE");
                     this.state.dictionary[i + "," + j] = null;
                     color++;
                     
                 } else {
+
                     if(i <= 2){
 
-                        piece = <Piece id={pieceIndex} class="Checkers-pieceRed" pieceColor={"RED"}/>;
+                        piece = new Piece(pieceIndex, "RED");
                         this.state.dictionary[i + "," + j] = piece;
-                        this.state.spaces[i][j] = <Space 
-                            id={i + "," + j}  
-                            spaceColor="Checkers-blackSpace" 
-                            handleClick={(id, piece) => this.handleClick(id, piece)}
-                            handleDoubleClick={this.handleDoubleClick} 
-                            piece={this.state.dictionary[i + "," + j]}
-                        />;
+                        this.state.spaces[i][j] = new Space((i + "," + j), piece, "BLACK");
                         pieceIndex++;
                         
 
                     } else if (i >= 5) {
 
-                        piece = <Piece id={pieceIndex} class="Checkers-pieceWhite" pieceColor={"WHITE"}/>
+                        piece = new Piece(pieceIndex, "WHITE");
                         this.state.dictionary[i + "," + j] = piece;
-                        this.state.spaces[i][j] = <Space 
-                            id={i + "," + j} 
-                            spaceColor="Checkers-blackSpace" 
-                            handleClick={(id, piece) => this.handleClick(id, piece)}
-                            handleDoubleClick={() => this.handleDoubleClick()}
-                            piece={this.state.dictionary[i + "," + j]}
-                        />;
+                        this.state.spaces[i][j] = new Space((i + "," + j), piece, "BLACK");
                         pieceIndex++;
                         
                     } else {
 
                         this.state.dictionary[i + "," + j] = null;
-                        this.state.spaces[i][j] = <Space 
-                            id={i + "," + j}  
-                            spaceColor="Checkers-blackSpace" 
-                            handleClick={(id, piece) => this.handleClick(id, piece)} 
-                            handleDoubleClick={() => this.handleDoubleClick()}
-                            piece={null}
-                        />;   
+                        this.state.spaces[i][j] = new Space((i + "," + j), null, "BLACK");
                     }
                     color--;
                 }
@@ -102,26 +97,37 @@ class Board extends React.Component {
         }
     }
 
-    async handleClick(id, piece){
+    async handleClick(id){
         
+        var piece;
+
         if(this.state.start === null){
 
+            piece = this.state.dictionary[id];
             piece === null ? //condition
                 this.setState({message: 'this space does not have a piece'}) ://true 
                 await this.setState({start: id, message: null});//false
             
         } else {
 
-            //since set state is asynchronous I ran into issues with updating the end property, the await statement fixed that
+            //since set state is asynchronous it causes setstate to act weird, the await statement fixed that
             if(this.state.dictionary[id] === null){
                 
                 await this.setState({end: id, message: null});
-
-                isValidMove(this.state.start, this.state.end, this.getDiagonalPiece()) ?//condition
+                
+                console.log('isvalidmove returned: ' + this.isValidMove(this.state.start, this.state.end, this.getDiagonalPiece()));
+                
+                this.isValidMove(this.state.start, this.state.end, this.getDiagonalPiece()) ?//condition
                     this.movePiece() ://true
-                    this.setState({message: 'Illegal Move'});//false
-        
+                    this.setState({message: 'Illegal Move'});//false      
+                /*
+                await this.isValidMove(this.state.start, this.state.end, this.getDiagonalPiece()).then(res => {
+                    res ? this.movePiece() : this.setState({message: 'Illegal Move'});
+                })
+                */
+            
             } else {
+
                 this.setState({message: 'Cannot place piece here this space is full'});
             }
         }   
@@ -160,23 +166,10 @@ class Board extends React.Component {
         var updatedDiction = this.state.dictionary;
 
         //replace the destination space with a piece
-        udpatedSpace[endIndex[0]][endIndex[1]] = null
-        udpatedSpace[endIndex[0]][endIndex[1]] = <Space 
-            id={this.state.end} 
-            spaceColor="Checkers-blackSpace" 
-            handleClick={(id, piece) => this.handleClick(id, piece)} 
-            piece={this.state.dictionary[this.state.start.split(',')]}
-        />;
+        udpatedSpace[endIndex[0]][endIndex[1]].piece = movingPiece;
 
         //replace the original space with a null piece
-        updatedDiction[this.state.end] = this.state.dictionary[this.state.start];
-        udpatedSpace[startIndex[0]][startIndex[1]] = null
-        udpatedSpace[startIndex[0]][startIndex[1]] = <Space 
-            id={this.state.start}  
-            spaceColor="Checkers-blackSpace" 
-            handleClick={(id, piece) => this.handleClick(id, piece)} 
-            piece={null}
-        />;
+        udpatedSpace[startIndex[0]][startIndex[1]].piece = null
 
         //update the state of the dictionary
         updatedDiction[this.state.start] = null;
@@ -192,16 +185,90 @@ class Board extends React.Component {
     }
 
     render() {
-        let index = 0;
-        let row;
-        let board = this.state.spaces.map(() => {
-            row = <div className="Checkers-row">{this.state.spaces[index]}</div>;
-            index++;
-            return row;
+
+        let board = [];
+
+        for(var i = 0; i <= 7; i++){
+
+            let rowArray = []
+
+            for(var j = 0; j <= 7; j++){
+
+                let space = this.state.spaces[i][j];
+
+                if(space.color === "WHITE"){
+
+                    rowArray.push(
+                        <Space 
+                            id={space.id}
+                            key={space.id}   
+                            spaceColor="Checkers-whiteSpace" 
+                            handleClick={(id) => this.handleClick(id)}
+                            piece={null}
+                        />
+                    );
+                } else {
+
+                    let id = space.id.split(",");
+                    let piece;
+
+                    console.log('SPACE: ' + space.color)
+                    piece = this.state.dictionary[space.id];
+
+                    if(piece !== null){
+                        piece.pieceColor === "RED" ? 
+                            piece = <Piece id={piece.id} class="Checkers-pieceRed"/>:
+                            piece = <Piece id={piece.id} class="Checkers-pieceWhite"/>
+                    }
+
+                    if(id[0] <= 2){
+
+                        rowArray.push(
+                            <Space 
+                                id={space.id}
+                                key={space.id}  
+                                spaceColor="Checkers-blackSpace" 
+                                handleClick={(id) => this.handleClick(id)}
+                                handleDoubleClick={this.handleDoubleClick} 
+                                piece={piece}
+                            />
+                        )
+                    } else if(id[0] >= 5) {
+
+                        rowArray.push(
+                            <Space 
+                                id={space.id}
+                                key={space.id}   
+                                spaceColor="Checkers-blackSpace" 
+                                handleClick={(id) => this.handleClick(id)}
+                                handleDoubleClick={this.handleDoubleClick} 
+                                piece={piece}
+                            />
+                        );
+                    } else {
+
+                        rowArray.push( 
+                            <Space 
+                                id={space.id}
+                                key={space.id}   
+                                spaceColor="Checkers-blackSpace" 
+                                handleClick={(id) => this.handleClick(id)} 
+                                handleDoubleClick={() => this.handleDoubleClick()}
+                                piece={piece}
+                            />
+                        );
+                    }
+                }
+            }
+            board.push(rowArray);
+        }
+        
+        const boardJSX = board.map((row) => {
+            return <div className="Checkers-row" key={board.indexOf(row)}>{row}</div>;
         })
         return (
             <div className="Checkers-board">
-                {board}
+                {boardJSX}
                 <footer>{this.state.start} + {this.state.message} + {this.state.end}</footer>
             </div>
         );
@@ -211,18 +278,65 @@ class Board extends React.Component {
 class Checkers extends React.Component {
     constructor(props){
         super(props);
+
+        this.switchTurn = this.switchTurn.bind(this);
+
         this.state = {
-            
+            currentTurn: 'WHITE',
         }
+
+    }
+    
+    async isValidMove(start, end, diagPiece) {
+        
+        var endIndex = end.split(',');
+        var startIndex = start.split(',');
+        var bool;
+        console.log('isvalidmove called');
+
+        if(diagPiece === null){
+            bool = ((endIndex[0] % 2 === 0 && endIndex[1] % 2 === 0) || (endIndex[0] % 2 !== 0 && endIndex[1] % 2 !== 0)) &&  
+                    (Math.abs(startIndex[0] - endIndex[0]) === 1 && Math.abs(startIndex[1] - endIndex[1]) === 1);
+                    console.log('Bool: ' + bool);
+            if(bool){
+                console.log('set state reached');
+                await this.switchTurn().then(res => {
+                    return bool;
+                });
+            }
+            return bool;
+        } else {
+            bool = ((Math.abs(endIndex[0] - startIndex[0]) === 2) && (Math.abs(endIndex[1] - startIndex[1])) === 2) &&
+                    (diagPiece.color !== this.state.currentTurn);
+                    console.log('Bool: ' + bool);
+            if(bool){
+                console.log('set state reached')
+                await this.switchTurn().then(res => {
+                    return bool;
+                });
+                /*
+                switchTurn().then(res => {
+                    return bool;
+                });
+                */
+            }
+            return bool;
+        }    
+    }
+
+    async switchTurn () {
+        var turn = this.state.currentTurn === "RED" ? "WHITE" : "RED";
+        await this.setState({currentTurn: turn});
+        return true;
     }
 
     render(){
         return(
             <div className="Checkers-game">
                 <header className="Checkers-header">
-                    CHECKERS!
+                    {this.state.currentTurn}
                 </header>
-                    <Board/>
+                    <Board isValidMove={(start, end, diagPiece) => this.isValidMove(end, start, diagPiece)}/>
             </div>
         )
     }
