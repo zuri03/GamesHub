@@ -3,7 +3,7 @@ function Home(props){
     return(
         <body>
             <form>
-                <button>here fuck</button>
+                <button>here</button>
             </form>
         </body>
     )
