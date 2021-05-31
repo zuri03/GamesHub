@@ -15,7 +15,13 @@ function Space(props) {
 
 function Piece(props){
     return (
-       <button className={props.class} key={props.id}/>
+       <button className={props.class} key={props.id}>
+            <img 
+                src="https://toppng.com/uploads/preview/king-crown-transparent-115525054964mmviw8x6l.png"
+                width="10"
+                height="10"
+            />
+       </button>
     );
 }
 
@@ -36,7 +42,6 @@ class Board extends React.Component {
 
         this.handleDoubleClick = this.handleDoubleClick.bind(this);
         
-        
         var color = 0;
         var pieceIndex = 0;
 
@@ -49,13 +54,18 @@ class Board extends React.Component {
         }
 
         class Piece {
-            constructor(id, pieceColor){
+            constructor(id, pieceColor, status){
                 this.id = id;
                 this.pieceColor = pieceColor;
+                this.status = status;
+                this.makeKing = this.makeKing.bind(this);
+            }
+
+            makeKing(){
+                this.status = "kING";
             }
         }
 
-        
         for(var i = 0; i < this.state.spaces.length; i++){
 
             var piece;
@@ -64,29 +74,26 @@ class Board extends React.Component {
             for(var j = 0; j < this.state.spaces.length; j++){
                 
                 let coords = i.toString() + "," + j.toString();
+
                 if(color === 0){
                     
                     this.state.spaces[i][j] = new Space((coords), null, "WHITE");
                     this.state.dictionary[coords] = null;
                     color++;
-                    
                 } else {
 
                     if(i <= 2){
 
-                        piece = new Piece(pieceIndex, "RED");
+                        piece = new Piece(pieceIndex, "RED", "NORMAL");
                         this.state.dictionary[coords] = piece;
                         this.state.spaces[i][j] = new Space((coords), piece, "BLACK");
                         pieceIndex++;
-                        
-
                     } else if (i >= 5) {
 
-                        piece = new Piece(pieceIndex, "WHITE");
+                        piece = new Piece(pieceIndex, "WHITE", "NORMAL");
                         this.state.dictionary[coords] = piece;
                         this.state.spaces[i][j] = new Space((coords), piece, "BLACK");
-                        pieceIndex++;
-                        
+                        pieceIndex++;                   
                     } else {
 
                         this.state.dictionary[coords] = null;
@@ -105,28 +112,19 @@ class Board extends React.Component {
         if(this.state.start === null){
 
             piece = this.state.dictionary[id];
-            /*
+             
             if(piece === null){
+
                 this.setState({message: 'this space does not have a piece'})
             } else {
-                await this.setState({start: id, message: null});
-                
-                
-                if(this.props.notOpponentPiece(piece.pieceColor)){
+                     
+                if(this.props.isValidMove(id, null, null, piece.pieceColor)){
                     await this.setState({start: id, message: null});
                 } else {
                     this.setState({message: 'You cannot move a piece of the opposite color'}) 
-                }
-                
-                
+                }          
             }
-            */
-
-            piece === null ? //condition
-                this.setState({message: 'this space does not have a piece'}) ://true 
-                await this.setState({start: id, message: null});//false
-            
-            
+               
         } else {
 
             //since set state is asynchronous it causes setstate to act weird, the await statement fixed that
@@ -134,7 +132,7 @@ class Board extends React.Component {
                 
                 await this.setState({end: id, message: null});
             
-                this.props.isValidMove(this.state.start, this.state.end, this.getDiagonalPiece(), this.state.dictionary[this.state.start].pieceColor) ?//condition
+                this.props.isValidMove(this.state.start, this.state.end, this.state.dictionary[this.getDiagonalPiece()], this.state.dictionary[this.state.start].pieceColor) ?//condition
                     this.movePiece() ://true
                     this.setState({message: 'Illegal Move'});//false      
             
@@ -146,6 +144,8 @@ class Board extends React.Component {
     }
 
     handleDoubleClick() {
+
+        //if a player wishes to move a different piece set everything to null
         this.setState({
             start: null,
             end: null,
@@ -153,10 +153,10 @@ class Board extends React.Component {
         });
     }
 
-    //gotta fix
     getDiagonalPiece(){
         var gapIndex = [];
         
+        //Based on the start and end position find the diagonal space in between and return the piece located there
         this.state.start[0] > this.state.end[0] ? //condition 
             gapIndex.push((parseInt(this.state.start[0]) - 1)) ://true
             gapIndex.push((parseInt(this.state.start[0]) + 1));//false
@@ -165,28 +165,38 @@ class Board extends React.Component {
             gapIndex.push((parseInt(this.state.start[2]) - 1)) ://true
             gapIndex.push((parseInt(this.state.start[2]) + 1));//false
       
-        return this.state.dictionary[gapIndex];
+        return gapIndex;
     }
     
     movePiece(){
 
         //Copy all of the necessary state properties 
-        var startIndex = this.state.start.split(',');
-        var endIndex = this.state.end.split(',');
+        var startIndex = this.state.start;
+        var endIndex = this.state.end;
         var movingPiece = this.state.dictionary[startIndex];
         var udpatedSpace = this.state.spaces;
-        var updatedDiction = this.state.dictionary;
+        var updatedDiction = this.state.dictionary;   
+        
+        if(Math.abs(endIndex[0] - startIndex[0]) > 1){
+            this.state.dictionary[this.getDiagonalPiece()] = null;
+        }
 
         //replace the destination space with a piece
-        udpatedSpace[endIndex[0]][endIndex[1]].piece = movingPiece;
+        udpatedSpace[endIndex[0]][endIndex[2]].piece = movingPiece;
 
         //replace the original space with a null piece
-        udpatedSpace[startIndex[0]][startIndex[1]].piece = null
+        udpatedSpace[startIndex[0]][startIndex[2]].piece = null
 
         //update the state of the dictionary
         updatedDiction[this.state.start] = null;
         updatedDiction[this.state.end] = movingPiece;
-        
+
+        //If piece reaches the far side of the board make it a king piece since normal pieces cannot move backwards we do not need to check the color
+        if(this.state.end[0] === 0 || this.state.end[0] === 7){
+            if(movingPiece.status !== "KING")
+                movingPiece.makeKing();
+        }
+          
         //update component state
         this.setState({
             spaces: udpatedSpace,
@@ -200,12 +210,13 @@ class Board extends React.Component {
 
         let board = [];
 
+        //generate a 2d array of JSX components  
         for(var i = 0; i <= 7; i++){
 
             let rowArray = []
 
             for(var j = 0; j <= 7; j++){
-
+            
                 let space = this.state.spaces[i][j];
 
                 if(space.color === "WHITE"){
@@ -221,10 +232,7 @@ class Board extends React.Component {
                     );
                 } else {
 
-                    let id = space.id.split(",");
                     let piece;
-
-                    console.log('SPACE: ' + space.color)
                     piece = this.state.dictionary[space.id];
 
                     if(piece !== null){
@@ -232,55 +240,28 @@ class Board extends React.Component {
                             piece = <Piece id={piece.id} class="Checkers-pieceRed"/>:
                             piece = <Piece id={piece.id} class="Checkers-pieceWhite"/>
                     }
-
-                    if(id[0] <= 2){
-
-                        rowArray.push(
-                            <Space 
-                                id={space.id}
-                                key={space.id}  
-                                spaceColor="Checkers-blackSpace" 
-                                handleClick={(id) => this.handleClick(id)}
-                                handleDoubleClick={this.handleDoubleClick} 
-                                piece={piece}
-                            />
-                        )
-                    } else if(id[0] >= 5) {
-
-                        rowArray.push(
-                            <Space 
-                                id={space.id}
-                                key={space.id}   
-                                spaceColor="Checkers-blackSpace" 
-                                handleClick={(id) => this.handleClick(id)}
-                                handleDoubleClick={this.handleDoubleClick} 
-                                piece={piece}
-                            />
-                        );
-                    } else {
-
-                        rowArray.push( 
-                            <Space 
-                                id={space.id}
-                                key={space.id}   
-                                spaceColor="Checkers-blackSpace" 
-                                handleClick={(id) => this.handleClick(id)} 
-                                handleDoubleClick={() => this.handleDoubleClick()}
-                                piece={piece}
-                            />
-                        );
-                    }
+                
+                    rowArray.push( 
+                        <Space 
+                            id={space.id}
+                            key={space.id}   
+                            spaceColor="Checkers-blackSpace" 
+                            handleClick={(id) => this.handleClick(id)} 
+                            handleDoubleClick={() => this.handleDoubleClick()}
+                            piece={piece}
+                        />
+                    );
                 }
             }
             board.push(rowArray);
         }
         
-        const boardJSX = board.map((row) => {
-            return <div className="Checkers-row" key={board.indexOf(row)}>{row}</div>;
-        })
+        //Return 2d array
         return (
             <div className="Checkers-board">
-                {boardJSX}
+                {board.map((row) => {
+                    return <div className="Checkers-row" key={board.indexOf(row)}>{row}</div>;
+                })}
                 <footer>{this.state.start} + {this.state.message} + {this.state.end}</footer>
             </div>
         );
@@ -297,41 +278,50 @@ class Checkers extends React.Component {
 
     }
     
-    isValidMove(start, end, diagPieceColor, movingPieceColor) {
+    isValidMove(start, end, diagPiece, movingPieceColor) {
 
-        var isValidMove;
-        console.log('Current Turn: ' + this.state.currentTurn);
+        if(end !== null){
 
-        if(movingPieceColor === this.state.currentTurn){
+            var isValidMove;
 
-            console.log('THEY ARE THE SAME COLOR');
+            //first check if the player tried to move an oponnent's piece
+            if(movingPieceColor === this.state.currentTurn){
 
-            if(diagPieceColor === null){
+                console.log('THEY ARE THE SAME COLOR');
 
-                console.log('DIAG PIECE IS NULL');
+                //Check if this is a jump move, if diagPieceColor is not null then it is a jump move
+                if(diagPiece === null){
 
-                isValidMove = ((end[0] % 2 === 0 && end[2] % 2 === 0) || (end[0] % 2 !== 0 && end[2] % 2 !== 0)) &&  
-                        (Math.abs(start[0] - end[0]) === 1 && Math.abs(start[2] - end[2]) === 1);
+                    console.log('DIAG PIECE IS NULL');
+
+                    //If it is not a jump move make sure they do not try to move to a whitespace and that they only move forward on space
+                    isValidMove = ((end[0] % 2 === 0 && end[2] % 2 === 0) || (end[0] % 2 !== 0 && end[2] % 2 !== 0)) &&  
+                                    (Math.abs(start[0] - end[0]) === 1 && Math.abs(start[2] - end[2]) === 1);
+                } else {
+
+                    //if it is a  jump move make sure they only make one jump at a time and that the piece they are jumping is an opponents piece
+                    isValidMove = ((end[0] % 2 === 0 && end[2] % 2 === 0) || (end[0] % 2 !== 0 && end[2] % 2 !== 0)) &&
+                                    ((Math.abs(end[0] - start[0]) === 2) && (Math.abs(end[2] - start[2])) === 2) &&
+                                        (diagPiece.pieceColor !== this.state.currentTurn);
+                }  
+                if(isValidMove){
+                    
+                    //If the move is valid switch turns
+                    var turn = this.state.currentTurn === "RED" ? "WHITE" : "RED";
+                    this.setState({currentTurn: turn});
+                }
             } else {
 
-                console.log('DIAG PIECE IS NOT NULL');
-
-                isValidMove = ((Math.abs(end[0] - start[0]) === 2) && (Math.abs(end[2] - start[2])) === 2) &&
-                        (diagPieceColor !== this.state.currentTurn);
-            }  
-            if(isValidMove){
-                    
-                var turn = this.state.currentTurn === "RED" ? "WHITE" : "RED";
-                this.setState({currentTurn: turn});
+                //Player tried moving an opponents piece
+                console.log('THEY ARE NOT THE SAME COLOR');
+                isValidMove = false;
             }
-        } else {
 
-            console.log('THEY ARE NOT THE SAME COLOR');
-            isValidMove = false;
+            console.log('RETURNING: ' + isValidMove);
+            return isValidMove; 
         }
 
-        console.log('RETURNING: ' + isValidMove);
-        return isValidMove; 
+        return movingPieceColor === this.state.currentTurn;
     }
 
     
@@ -347,8 +337,7 @@ class Checkers extends React.Component {
                     {this.state.currentTurn}
                 </header>
                     <Board 
-                        isValidMove={(start, end, diagPieceColor, movingPieceColor) => this.isValidMove(end, start, diagPieceColor, movingPieceColor)}
-                        //notOpponentPiece={this.notOpponentPiece}
+                        isValidMove={(start, end, diagPiece, movingPieceColor) => this.isValidMove(start, end, diagPiece, movingPieceColor)}
                     />
             </div>
         )

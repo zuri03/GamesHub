@@ -8,15 +8,20 @@ import {
 import logo from './logo.svg';
 import './App.css';
 import Checkers from './Checkers/Checkers.js';
+import Home from './Home.js';
 
 const img = "https://www.seekpng.com/png/detail/232-2328978_icon-checkers-icon.png"
 function App() {
   return (
+    
     <div className="App">
       <header className="App-header"> GamesHub! 
       </header>
         <Router>
           <Switch>
+          <Route exact path="/">
+            <Home />
+          </Route>
           <Route path="/Checkers">
             <Checkers />
           </Route>
@@ -24,6 +29,19 @@ function App() {
         </Router>
     </div>
     /*
+    <div className="App">
+      <Router>
+        <Switch> 
+          <Route path="/">
+          <header className="App-header"> GamesHub! </header>
+          </Route>    
+          <Route path="/Checkers">
+            <Checkers />
+          </Route>
+        </Switch>
+      </Router>
+  </div>
+    
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
