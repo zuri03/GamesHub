@@ -14,15 +14,22 @@ function Space(props) {
 }
 
 function Piece(props){
-    return (
-       <button className={props.class} key={props.id}>
-            <img 
-                src="https://toppng.com/uploads/preview/king-crown-transparent-115525054964mmviw8x6l.png"
-                width="10"
-                height="10"
-            />
-       </button>
-    );
+    if(props.isKing){
+        return (
+            <button className={props.class} key={props.id}>
+                    <img 
+                        src="https://toppng.com/uploads/preview/king-crown-transparent-115525054964mmviw8x6l.png"
+                        width="20"
+                        height="20"
+                    />
+            </button>
+        );
+    } else {
+        return (
+            <button className={props.class} key={props.id}>
+            </button>
+        );
+    }
 }
 
 class Board extends React.Component {
@@ -62,17 +69,18 @@ class Board extends React.Component {
             }
 
             makeKing(){
-                this.status = "kING";
+                this.status = "KING";
             }
         }
 
         for(var i = 0; i < this.state.spaces.length; i++){
 
-            var piece;
+            let piece;
+            
             color = (i % 2) === 0 ? 1 : 0;
 
             for(var j = 0; j < this.state.spaces.length; j++){
-                
+            
                 let coords = i.toString() + "," + j.toString();
 
                 if(color === 0){
@@ -101,8 +109,9 @@ class Board extends React.Component {
                     }
                     color--;
                 }
+                
             }
-        }
+        }  
     }
 
     async handleClick(id){
@@ -192,9 +201,10 @@ class Board extends React.Component {
         updatedDiction[this.state.end] = movingPiece;
 
         //If piece reaches the far side of the board make it a king piece since normal pieces cannot move backwards we do not need to check the color
-        if(this.state.end[0] === 0 || this.state.end[0] === 7){
-            if(movingPiece.status !== "KING")
+        if(parseInt(this.state.end[0]) === 0 || parseInt(this.state.end[0]) === 7){
+            if(movingPiece.status !== "KING"){
                 movingPiece.makeKing();
+            }
         }
           
         //update component state
@@ -216,7 +226,7 @@ class Board extends React.Component {
             let rowArray = []
 
             for(var j = 0; j <= 7; j++){
-            
+    
                 let space = this.state.spaces[i][j];
 
                 if(space.color === "WHITE"){
@@ -236,11 +246,18 @@ class Board extends React.Component {
                     piece = this.state.dictionary[space.id];
 
                     if(piece !== null){
+
+                        let isKing;
+                        
+                        piece.status === "KING" ?
+                            isKing = true:
+                            isKing = false;
+
                         piece.pieceColor === "RED" ? 
-                            piece = <Piece id={piece.id} class="Checkers-pieceRed"/>:
-                            piece = <Piece id={piece.id} class="Checkers-pieceWhite"/>
+                            piece = <Piece id={piece.id} isKing={isKing} class="Checkers-pieceRed"/>:
+                            piece = <Piece id={piece.id} isKing={isKing} class="Checkers-pieceWhite"/>;
                     }
-                
+                    
                     rowArray.push( 
                         <Space 
                             id={space.id}
@@ -323,12 +340,6 @@ class Checkers extends React.Component {
 
         return movingPieceColor === this.state.currentTurn;
     }
-
-    
-    notOpponentPiece(color){
-        return color === this.state.currentTurn;
-    }
-    
 
     render(){
         return(

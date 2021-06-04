@@ -1,11 +1,21 @@
 import React from 'react';
+
 function Home(props){
     return(
-        <body>
-            <form>
-                <button>here</button>
-            </form>
-        </body>
+        <div className="Container">
+            <div className="Checkers-link">
+                <div className="Checkers-desc">
+                <button 
+                    onClick={(e) => {
+                        e.preventDefault();
+                        window.location.href='http://localhost:3000/Checkers';
+                    }} 
+                    type="button">
+                    Checkers!
+                </button>
+                </div>
+            </div>
+        </div>
     )
 }
 

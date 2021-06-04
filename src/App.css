@@ -7,7 +7,54 @@
   pointer-events: none;
 }
 
+/*
+.Container {
+  display: grid;
+  grid-template-columns: [firstCol] 200px [secondCol] 200px;
+  grid-template-rows: [firstRow] 200px [secondRow] 200px;
+}
+*/
+@keyframes example {
+  from {border: 10px solid rgb(179, 13, 13)}
+  to {border: 10px solid rgb(140, 0, 255)}
+}
+@keyframes showLink {
+  from {margin-top: 100%;}
+  to {margin-top: 0%;}
+}
+/* The element to apply the animation to */
+
+.Container {
+  display: grid;
+  grid-template-columns: [firstCol] 1fr [secondCol] 1fr;
+  grid-template-rows: [firstRow] 1fr [secondRow] 1fr;
+}
+.Checkers-link{
+  display: grid;
+  grid-template-columns: [firstCol] 100% [secondCol] 0%;
+  grid-template-rows: [firstRow] 100% [secondRow] 0%;
+  grid-column-start: 1;
+  grid-column-end: 2;
+  grid-row-start: 1;
+  grid-row-end: 2;
+  margin-top: 100%;
+  animation-name: showlink;
+  animation-duration: 4s;
+  animation-fill-mode: forwards;
+}
+
+.Checkers-desc{
+
+}
 .Checkers-pieceRed {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  background: rgb(255, 0, 0);
+  border-radius: 50%;
+}
+
+.Checkers-pieceRed{
   display: inline-block;
   width: 40px;
   height: 40px;
@@ -22,6 +69,15 @@
   background: rgb(255, 255, 255);
   border-radius: 50%;
 }
+
+.Checkers-pieceWhite {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  background: rgb(255, 255, 255);
+  border-radius: 50%;
+}
+
 .Checkers-whiteSpace {
   
   background: #fff;
