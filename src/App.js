@@ -41,6 +41,16 @@ class App extends React.Component{
             </Route>
             </Switch>
           </Router>
+        <footer className="App-footer">
+          <button 
+            onClick={(e) => {
+              e.preventDefault();
+              window.location.href='http://localhost:3000/';
+            }} 
+            type="button">
+            Home!
+          </button>
+        </footer>
       </div>
       /*
       <div className="App">
