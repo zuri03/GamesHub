@@ -126,21 +126,20 @@ class Board extends React.Component {
                 this.setState({message: 'this space does not have a piece'})
             } else {
                      
-                if(this.props.isValidMove(id, null, null, piece.pieceColor)){
+                if(this.props.isValidMove(id, null, null, piece)){
                     await this.setState({start: id, message: ""});
                 } else {
                     this.setState({message: 'You cannot move a piece of the opposite color'}) 
                 }          
-            }
-               
+            }    
         } else {
 
             //since set state is asynchronous it causes setstate to act weird, the await statement fixed that
             if(this.state.dictionary[id] === null){
                 
                 await this.setState({end: id, message: null});
-            
-                this.props.isValidMove(this.state.start, this.state.end, this.state.dictionary[this.getDiagonalPiece()], this.state.dictionary[this.state.start].pieceColor) ?//condition
+
+                this.props.isValidMove(this.state.start, this.state.end, this.state.dictionary[this.getDiagonalPiece()], this.state.dictionary[this.state.start]) ?//condition
                     this.movePiece() ://true
                     this.setState({message: 'Illegal Move'});//false      
             
@@ -157,7 +156,7 @@ class Board extends React.Component {
         this.setState({
             start: null,
             end: null,
-            message: null
+            message: "SELECT A PIECE"
         });
     }
 
@@ -227,7 +226,7 @@ class Board extends React.Component {
             let rowArray = []
 
             for(var j = 0; j <= 7; j++){
-    
+                
                 let space = this.state.spaces[i][j];
 
                 if(space.color === "WHITE"){
@@ -305,78 +304,91 @@ class Checkers extends React.Component {
 
     }
     
-    isValidMove(start, end, diagPiece, movingPieceColor) {
+    //Have to refactor to simplify
+    isValidMove(start, end, diagPiece, movingPiece) {
 
         if(end !== null){
 
             let isValidMove;
 
-            //first check if the player tried to move an oponnent's piece
-            if(movingPieceColor === this.state.currentTurn){
-
-                console.log('THEY ARE THE SAME COLOR');
-
-                //Check if this is a jump move, if diagPieceColor is not null then it is a jump move
-                if(diagPiece === null){
-
-                    console.log('DIAG PIECE IS NULL');
-
-                    //If it is not a jump move make sure they do not try to move to a whitespace and that they only move forward on space
-                    isValidMove = ((end[0] % 2 === 0 && end[2] % 2 === 0) || (end[0] % 2 !== 0 && end[2] % 2 !== 0)) &&  
-                                    (Math.abs(start[0] - end[0]) === 1 && Math.abs(start[2] - end[2]) === 1);
+            if(movingPiece.status !== "KING"){
+                if(movingPiece.pieceColor === "RED"){
+                    if((start[0] - end[0]) > 0){
+                        return false;
+                    }
                 } else {
-
-                    //if it is a  jump move make sure they only make one jump at a time and that the piece they are jumping is an opponents piece
-                    isValidMove = ((end[0] % 2 === 0 && end[2] % 2 === 0) || (end[0] % 2 !== 0 && end[2] % 2 !== 0)) &&
-                                    ((Math.abs(end[0] - start[0]) === 2) && (Math.abs(end[2] - start[2])) === 2) &&
-                                        (diagPiece.pieceColor !== this.state.currentTurn);
-
-                    this.removePiece(diagPiece.color);
-                    this.findWinner(diagPiece.color);     
-                }  
-                if(isValidMove){
-                    
-                    //If the move is valid switch turns
-                    var turn = this.state.currentTurn === "RED" ? "WHITE" : "RED";
-                    this.setState({currentTurn: turn});
-                } 
-            } else {
-
-                //Player tried moving an opponents piece
-                console.log('THEY ARE NOT THE SAME COLOR');
-                isValidMove = false;
+                    if((start[0] - end[0]) < 0){
+                        return false;
+                    }
+                }
             }
 
-            console.log('RETURNING: ' + isValidMove);
+            //Check if this is a jump move, if diagPieceColor is not null then it is a jump move
+            if(diagPiece === null){
+
+               //If it is not a jump move make sure they do not try to move to a whitespace and that they only move forward on space
+                isValidMove = ((end[0] % 2 === 0 && end[2] % 2 === 0) || (end[0] % 2 !== 0 && end[2] % 2 !== 0)) &&  
+                                (Math.abs(start[0] - end[0]) === 1 && Math.abs(start[2] - end[2]) === 1);
+            } else {
+
+                //if it is a  jump move make sure they only make one jump at a time and that the piece they are jumping is an opponents piece
+                isValidMove = ((end[0] % 2 === 0 && end[2] % 2 === 0) || (end[0] % 2 !== 0 && end[2] % 2 !== 0)) &&
+                                ((Math.abs(end[0] - start[0]) === 2) && (Math.abs(end[2] - start[2])) === 2) &&
+                                    (diagPiece.pieceColor !== this.state.currentTurn);
+
+                this.removePiece(diagPiece.pieceColor);     
+            }  
+            if(isValidMove){
+                this.findWinner();
+            } 
+
             return isValidMove; 
         }
 
-        return movingPieceColor === this.state.currentTurn;
+        return movingPiece.pieceColor === this.state.currentTurn;
     }
 
     removePiece(color){
+
         let pieces;
+
         if(color === "RED"){
+
             pieces = this.state.redPieces - 1
             this.setState({redPieces: pieces})
         } else {
+
             pieces = this.state.whitePieces - 1
             this.setState({whitePieces: pieces})
         }
     }
-    
-    findWinner(){
+
+    findWinner(){   
         if(this.state.whitePieces === 0 || this.state.redPieces === 0){
             this.setState({currentTurn: "WE HAVE A WINNER"})
+        } else { 
+            let turn = this.state.currentTurn === "RED" ? "WHITE" : "RED";
+            this.setState({currentTurn: turn});
         }
     }
+
+    componentDidMount(){
+        //Eventually will replace all of the html event tags with this format soon
+        let endTurn = <button className="Checkers-endturn"> End Turn</button>;
+        endTurn.addEventListener('click', () => {
+            let turn = this.state.currentTurn === "RED" ? "WHITE" : "RED";
+            this.setState({currentTurn: turn});
+        });
+    }
     render(){
+ 
         return(
             <div className="Checkers-game">
-                <header className="Checkers-header">
-                    {this.state.currentTurn}
-                </header>
-                    <Board 
+                <div className="Checkers-sidebar">
+                    <div className="Checkers-turn">Current Turn: {this.state.currentTurn}</div>
+                    {endTurn}
+                </div>
+                    <Board className="Checkers-board"
                         isValidMove={(start, end, diagPiece, movingPieceColor) => this.isValidMove(start, end, diagPiece, movingPieceColor)}
                     />
             </div>  
