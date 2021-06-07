@@ -1,4 +1,5 @@
 import React from 'react';
+import './Checkers.css'
 
 function Space(props) {
     return (
@@ -7,7 +8,7 @@ function Space(props) {
             key={props.id} 
             className={props.spaceColor} 
             onClick={(id) => props.handleClick(props.id)}
-            onDoubleClick={props.handleDoubleClick}> 
+            onDoubleClick={props.handleDoubleClick}>
             {props.piece}
         </div>   
     );
@@ -39,11 +40,13 @@ class Board extends React.Component {
 
         const rows = Array(8).fill(null);
         this.state = {
+
             spaces : Array(8).fill(null).map(() => rows.slice()),
             start: null,
             end: null,
             message: "SELECT A PIECE",
             dictionary: {},
+
         };
 
         this.handleDoubleClick = this.handleDoubleClick.bind(this);
@@ -52,24 +55,28 @@ class Board extends React.Component {
         var pieceIndex = 0;
 
         class Space {
+
             constructor(id, piece, color){
+
                 this.id = id;
                 this.piece = piece;
                 this.color = color;
+
             }
         }
 
         class Piece {
+
             constructor(id, pieceColor, status){
+
                 this.id = id;
                 this.pieceColor = pieceColor;
                 this.status = status;
                 this.makeKing = this.makeKing.bind(this);
+
             }
 
-            makeKing(){
-                this.status = "KING";
-            }
+            makeKing(){this.status = "KING";}
         }
 
         for(var i = 0; i < this.state.spaces.length; i++){
@@ -87,6 +94,7 @@ class Board extends React.Component {
                     this.state.spaces[i][j] = new Space((coords), null, "WHITE");
                     this.state.dictionary[coords] = null;
                     color++;
+
                 } else {
 
                     if(i <= 2){
@@ -95,16 +103,19 @@ class Board extends React.Component {
                         this.state.dictionary[coords] = piece;
                         this.state.spaces[i][j] = new Space((coords), piece, "BLACK");
                         pieceIndex++;
+
                     } else if (i >= 5) {
 
                         piece = new Piece(pieceIndex, "WHITE", "NORMAL");
                         this.state.dictionary[coords] = piece;
                         this.state.spaces[i][j] = new Space((coords), piece, "BLACK");
-                        pieceIndex++;                   
+                        pieceIndex++; 
+
                     } else {
 
                         this.state.dictionary[coords] = null;
                         this.state.spaces[i][j] = new Space((coords), null, "BLACK");
+
                     }
                     color--;
                 }
@@ -114,23 +125,24 @@ class Board extends React.Component {
     }
 
     async handleClick(id){
-        
-        var piece;
 
         if(this.state.start === null){
 
-            piece = this.state.dictionary[id];
+            let piece = this.state.dictionary[id];
              
-            if(piece === null){
+            if(piece !== null){
 
-                this.setState({message: 'this space does not have a piece'})
+                if(this.props.isValidMove(id, null, null, piece)){
+
+                    await this.setState({start: id});
+
+                } 
             } else {
                      
                 if(this.props.isValidMove(id, null, null, piece)){
-                    await this.setState({start: id, message: ""});
-                } else {
-                    this.setState({message: 'You cannot move a piece of the opposite color'}) 
-                }          
+
+                    await this.setState({start: id});
+                }           
             }    
         } else {
 
@@ -139,14 +151,11 @@ class Board extends React.Component {
                 
                 await this.setState({end: id, message: null});
 
-                this.props.isValidMove(this.state.start, this.state.end, this.state.dictionary[this.getDiagonalPiece()], this.state.dictionary[this.state.start]) ?//condition
-                    this.movePiece() ://true
-                    this.setState({message: 'Illegal Move'});//false      
-            
-            } else {
+                if(this.props.isValidMove(this.state.start, this.state.end, this.state.dictionary[this.getDiagonalPiece()], this.state.dictionary[this.state.start])){
 
-                this.setState({message: 'Cannot place piece here this space is full'});
-            }
+                    this.movePiece();
+                }       
+            } 
         }   
     }
 
@@ -161,7 +170,7 @@ class Board extends React.Component {
     }
 
     getDiagonalPiece(){
-        var gapIndex = [];
+        let gapIndex = [];
         
         //Based on the start and end position find the diagonal space in between and return the piece located there
         this.state.start[0] > this.state.end[0] ? //condition 
@@ -201,21 +210,25 @@ class Board extends React.Component {
 
         //If piece reaches the far side of the board make it a king piece since normal pieces cannot move backwards we do not need to check the color
         if(parseInt(this.state.end[0]) === 0 || parseInt(this.state.end[0]) === 7){
+
             if(movingPiece.status !== "KING"){
+
                 movingPiece.makeKing();
             }
         }
           
         //update component state
         this.setState({
+
             spaces: udpatedSpace,
             dictionary: updatedDiction,
             start: null,
             end: null,
             message: "SELECT A PIECE"
+
         });                      
     }
-
+    
     render() {
 
         let board = [];
@@ -240,25 +253,23 @@ class Board extends React.Component {
                             piece={null}
                         />
                     );
+
                 } else {
 
-                    let piece;
-                    piece = this.state.dictionary[space.id];
+                    let piece = this.state.dictionary[space.id];;
 
                     if(piece !== null){
 
-                        let isKing;
-                        
-                        piece.status === "KING" ?
-                            isKing = true:
-                            isKing = false;
+                        let isKing = piece.status === "KING" ? true : false;
                         
                         if(space.id === this.state.start){
 
                             piece.pieceColor === "RED" ? 
                                 piece = <Piece id={piece.id} isKing={isKing} class="Checkers-pieceRed-selected"/>:
                                 piece = <Piece id={piece.id} isKing={isKing} class="Checkers-pieceWhite-selected"/>;
+
                         } else {
+
                             piece.pieceColor === "RED" ? 
                                 piece = <Piece id={piece.id} isKing={isKing} class="Checkers-pieceRed"/>:
                                 piece = <Piece id={piece.id} isKing={isKing} class="Checkers-pieceWhite"/>;
@@ -275,6 +286,7 @@ class Board extends React.Component {
                             piece={piece}
                         />
                     );
+
                 }
             }
             board.push(rowArray);
@@ -286,7 +298,6 @@ class Board extends React.Component {
                 {board.map((row) => {
                     return <div className="Checkers-row" key={board.indexOf(row)}>{row}</div>;
                 })}
-                <footer className="Checkers-footer">{this.state.message}</footer>
             </div>
         );
     }
@@ -299,25 +310,36 @@ class Checkers extends React.Component {
         this.state = {
             currentTurn: 'WHITE',
             redPieces: 12,
-            whitePieces: 12
+            whitePieces: 12,
+            message: "SELECT A PIECE"
         }
+
+        this.switchTurn = this.switchTurn.bind(this);
 
     }
     
     //Have to refactor to simplify
     isValidMove(start, end, diagPiece, movingPiece) {
 
+        let isValidMove;
+
         if(end !== null){
 
-            let isValidMove;
-
             if(movingPiece.status !== "KING"){
+
                 if(movingPiece.pieceColor === "RED"){
+
                     if((start[0] - end[0]) > 0){
+
+                        this.setMessage("CANNOT MOVE A NORMAL PIECE BACKWARDS");
                         return false;
                     }
+
                 } else {
+
                     if((start[0] - end[0]) < 0){
+
+                        this.setMessage("CANNOT MOVE A NORMAL PIECE BACKWARDS"); 
                         return false;
                     }
                 }
@@ -329,6 +351,7 @@ class Checkers extends React.Component {
                //If it is not a jump move make sure they do not try to move to a whitespace and that they only move forward on space
                 isValidMove = ((end[0] % 2 === 0 && end[2] % 2 === 0) || (end[0] % 2 !== 0 && end[2] % 2 !== 0)) &&  
                                 (Math.abs(start[0] - end[0]) === 1 && Math.abs(start[2] - end[2]) === 1);
+
             } else {
 
                 //if it is a  jump move make sure they only make one jump at a time and that the piece they are jumping is an opponents piece
@@ -336,16 +359,37 @@ class Checkers extends React.Component {
                                 ((Math.abs(end[0] - start[0]) === 2) && (Math.abs(end[2] - start[2])) === 2) &&
                                     (diagPiece.pieceColor !== this.state.currentTurn);
 
-                this.removePiece(diagPiece.pieceColor);     
-            }  
-            if(isValidMove){
-                this.findWinner();
+                if(isValidMove){
+    
+                    this.removePiece(diagPiece.pieceColor); 
+                }
             } 
+
+            if(isValidMove){
+
+                this.findWinner();
+
+            } else {
+
+                this.setMessage("ILLEGAL MOVE");
+            }
 
             return isValidMove; 
         }
 
-        return movingPiece.pieceColor === this.state.currentTurn;
+        isValidMove = movingPiece.pieceColor === this.state.currentTurn;
+
+        if(!isValidMove){
+
+            this.setMessage("CANNOT MOVE OPPONENT'S PIECE");
+        }
+
+        return isValidMove;
+    }
+
+    setMessage(newMessage){
+
+        this.setState({message: newMessage});
     }
 
     removePiece(color){
@@ -354,39 +398,39 @@ class Checkers extends React.Component {
 
         if(color === "RED"){
 
-            pieces = this.state.redPieces - 1
-            this.setState({redPieces: pieces})
+            pieces = this.state.redPieces - 1;
+            this.setState({redPieces: pieces});
+
         } else {
 
-            pieces = this.state.whitePieces - 1
-            this.setState({whitePieces: pieces})
+            pieces = this.state.whitePieces - 1;
+            this.setState({whitePieces: pieces});
         }
     }
 
     findWinner(){   
+
         if(this.state.whitePieces === 0 || this.state.redPieces === 0){
-            this.setState({currentTurn: "WE HAVE A WINNER"})
-        } else { 
-            let turn = this.state.currentTurn === "RED" ? "WHITE" : "RED";
-            this.setState({currentTurn: turn});
-        }
+
+            this.setState({currentTurn: "WE HAVE A WINNER"});
+        } 
     }
 
-    componentDidMount(){
-        //Eventually will replace all of the html event tags with this format soon
-        let endTurn = <button className="Checkers-endturn"> End Turn</button>;
-        endTurn.addEventListener('click', () => {
-            let turn = this.state.currentTurn === "RED" ? "WHITE" : "RED";
-            this.setState({currentTurn: turn});
-        });
+    switchTurn(){
+
+        let turn = this.state.currentTurn === "RED" ? "WHITE" : "RED";
+        this.setState({currentTurn: turn});
+        this.setMessage("SELECT A PIECE");  
     }
+
     render(){
  
         return(
             <div className="Checkers-game">
                 <div className="Checkers-sidebar">
                     <div className="Checkers-turn">Current Turn: {this.state.currentTurn}</div>
-                    {endTurn}
+                    <div className="Checkers-message">{this.state.message}</div>
+                    <button className="Checkers-endTurn" onClick={this.switchTurn}> End Turn</button>
                 </div>
                     <Board className="Checkers-board"
                         isValidMove={(start, end, diagPiece, movingPieceColor) => this.isValidMove(start, end, diagPiece, movingPieceColor)}
