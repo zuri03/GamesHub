@@ -311,7 +311,8 @@ class Checkers extends React.Component {
             currentTurn: 'WHITE',
             redPieces: 12,
             whitePieces: 12,
-            message: "SELECT A PIECE"
+            message: "SELECT A PIECE",
+            movingPiece: null
         }
 
         this.switchTurn = this.switchTurn.bind(this);
@@ -320,6 +321,21 @@ class Checkers extends React.Component {
     
     //Have to refactor to simplify
     isValidMove(start, end, diagPiece, movingPiece) {
+
+        if(this.state.movingPiece !== null){
+ 
+            if(this.state.movingPiece !== movingPiece.id){
+
+                this.setMessage("ONLY ALLOWED TO MAKE ANY AVAILABLE DOUBLE JUMPS");
+                return false;
+            }
+
+            if(diagPiece === null && end !== null){
+
+                this.setMessage("ONLY ALLOWED TO MAKE ANY AVAILABLE DOUBLE JUMPS");
+                return false;
+            }
+        }
 
         let isValidMove;
 
@@ -360,12 +376,15 @@ class Checkers extends React.Component {
                                     (diagPiece.pieceColor !== this.state.currentTurn);
 
                 if(isValidMove){
-    
+                    
                     this.removePiece(diagPiece.pieceColor); 
                 }
             } 
 
             if(isValidMove){
+
+                let id = movingPiece.id;
+                this.setState({movingPiece: id});
 
                 this.findWinner();
 
@@ -419,7 +438,7 @@ class Checkers extends React.Component {
     switchTurn(){
 
         let turn = this.state.currentTurn === "RED" ? "WHITE" : "RED";
-        this.setState({currentTurn: turn});
+        this.setState({currentTurn: turn, movingPiece: null});
         this.setMessage("SELECT A PIECE");  
     }
 

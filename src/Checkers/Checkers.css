@@ -2,19 +2,13 @@
   Currently learning to use css so everything is messy and the over use of borders is just so I can visually 
   seperate each element on the page during development. I will remove the borders once checkers is complete
 */
-.Checkers-pieceRed {
-    display: inline-block;
-    width: 40px;
-    height: 40px;
-    background: rgb(255, 0, 0);
-    border-radius: 50%;
-}
+
   
 .Checkers-pieceRed{
     align-self: center;
     display: inline-block;
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
     background: rgb(255, 0, 0);
     border-radius: 50%;
 }
@@ -22,16 +16,16 @@
 .Checkers-pieceWhite {
     align-self: center;
     display: inline-block;
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
     background: rgb(255, 255, 255);
     border-radius: 50%;
 }
 
 .Checkers-pieceWhite-selected {
     display: inline-block;
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
     background: rgb(255, 255, 255);
     border-radius: 50%;
     animation-name: blinking;
@@ -49,8 +43,8 @@
 }
 .Checkers-pieceRed-selected{
     display: inline-block;
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
     background: rgb(255, 0, 0);
     border-radius: 50%;
     animation-name: blinking;
@@ -59,6 +53,7 @@
     animation-direction: alternate;
 }
 .Checkers-whiteSpace {
+    padding: 10px;
     background: #fff;
     float: center;
     line-height: 34px; 
@@ -72,6 +67,8 @@
     border: 1px solid rgb(179, 13, 13);
 }
 .Checkers-blackSpace {
+    
+    padding: 5px;
     background: rgb(0, 0, 0);
     float: center;
     line-height: 34px;

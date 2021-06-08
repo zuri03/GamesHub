@@ -27,11 +27,12 @@ class App extends React.Component{
   render(){
     
     return (
-      
       <div className="App">
         <header className="App-header"> GamesHub! 
         </header>
-          <Router>
+        <body className="App-body">
+        </body>
+        <Router>
             <Switch>
             <Route exact path="/">
               <Home />
@@ -40,7 +41,7 @@ class App extends React.Component{
               <Checkers />
             </Route>
             </Switch>
-          </Router>
+        </Router>
         <footer className="App-footer">
           <button 
             onClick={(e) => {
@@ -54,33 +55,30 @@ class App extends React.Component{
       </div>
       /*
       <div className="App">
-        <Router>
-          <Switch> 
-            <Route path="/">
-            <header className="App-header"> GamesHub! </header>
-            </Route>    
+        <header className="App-header"> GamesHub! 
+        </header>
+          <Router>
+            <Switch>
+            <Route exact path="/">
+              <Home />
+            </Route>
             <Route path="/Checkers">
               <Checkers />
             </Route>
-          </Switch>
-        </Router>
-    </div>
-      
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+            </Switch>
+          </Router>
+  
+        <body className="App-body"></body>
+        <footer className="App-footer">
+          <button 
+            onClick={(e) => {
+              e.preventDefault();
+              window.location.href='http://localhost:3000/';
+            }} 
+            type="button">
+            Home!
+          </button>
+        </footer>
       </div>
       */
     )
