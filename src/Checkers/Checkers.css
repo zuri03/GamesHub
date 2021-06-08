@@ -122,7 +122,6 @@ display: grid;
 grid-template-columns: [firstCol] 275px [secondCol] auto;
 grid-template-rows: [firstRow] 570px;
 align-self: center;
-border: 10px solid rgb(40, 211, 34);
 }
 
 .Checkers-board {
@@ -130,7 +129,6 @@ margin: -1;
 display: grid;
 align-content: center;
 width: 800px;
-border: 5px solid rgb(77, 13, 179);
 grid-row-start: span [secondCol];
 }
 
