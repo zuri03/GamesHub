@@ -196,8 +196,7 @@ class Board extends React.Component {
         if(Math.abs(endIndex[0] - startIndex[0]) > 1){
             this.state.dictionary[this.getDiagonalPiece()] = null;
         }
-
-        //gonna fix seems redundant
+        
         //replace the destination space with a piece
         udpatedSpace[endIndex[0]][endIndex[2]].piece = movingPiece;
 
