@@ -129,21 +129,12 @@ class Board extends React.Component {
         if(this.state.start === null){
 
             let piece = this.state.dictionary[id];
-             
-            if(piece !== null){
 
-                if(this.props.isValidMove(id, null, null, piece)){
+            if(this.props.isValidMove(id, null, null, piece)){
 
-                    await this.setState({start: id});
+                await this.setState({start: id});
 
-                } 
-            } else {
-                     
-                if(this.props.isValidMove(id, null, null, piece)){
-
-                    await this.setState({start: id});
-                }           
-            }    
+            }   
         } else {
 
             //since set state is asynchronous it causes setstate to act weird, the await statement fixed that
@@ -311,7 +302,7 @@ class Checkers extends React.Component {
             redPieces: 12,
             whitePieces: 12,
             message: "SELECT A PIECE",
-            movingPiece: null
+            jumpingPiece: null
         }
 
         this.switchTurn = this.switchTurn.bind(this);
@@ -319,11 +310,12 @@ class Checkers extends React.Component {
     }
     
     //Have to refactor to simplify
+    //When making a double jump if the player selects an piece other than jump piece an error occurs
     isValidMove(start, end, diagPiece, movingPiece) {
 
-        if(this.state.movingPiece !== null){
+        if(this.state.jumpingPiece !== null){
  
-            if(this.state.movingPiece !== movingPiece.id){
+            if(this.state.jumpingPiece !== movingPiece.id){
 
                 this.setMessage("ONLY ALLOWED TO MAKE ANY AVAILABLE DOUBLE JUMPS");
                 return false;
@@ -383,7 +375,7 @@ class Checkers extends React.Component {
             if(isValidMove){
 
                 let id = movingPiece.id;
-                this.setState({movingPiece: id});
+                this.setState({jumpingPiece: id});
 
                 this.findWinner();
 
@@ -395,6 +387,12 @@ class Checkers extends React.Component {
             return isValidMove; 
         }
 
+        if(movingPiece === null){
+
+            this.setMessage("MUST SELECT A PIECE TO MOVE");
+            return false;
+        }
+        
         isValidMove = movingPiece.pieceColor === this.state.currentTurn;
 
         if(!isValidMove){
@@ -437,7 +435,7 @@ class Checkers extends React.Component {
     switchTurn(){
 
         let turn = this.state.currentTurn === "RED" ? "WHITE" : "RED";
-        this.setState({currentTurn: turn, movingPiece: null});
+        this.setState({currentTurn: turn, jumpingPiece: null});
         this.setMessage("SELECT A PIECE");  
     }
 

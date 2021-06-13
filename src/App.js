@@ -5,9 +5,9 @@ import {
   Redirect
 } from "react-router-dom";
 
-import logo from './logo.svg';
 import './App.css';
 import Checkers from './Checkers/Checkers.js';
+import WordSolver from './WordSolver/WordSolver.js';
 import Home from './Home.js';
 import React from "react";
 
@@ -39,6 +39,9 @@ class App extends React.Component{
             </Route>
             <Route path="/Checkers">
               <Checkers />
+            </Route>
+            <Route path="/WordSolver">
+              <WordSolver />
             </Route>
             </Switch>
         </Router>
