@@ -17,4 +17,21 @@
     text-align: center;
 }
 
+.Word-Solver{
+    display: grid;
+    grid-template-rows: [letters] 1fr [input] 1fr [gameInfo] 1fr;
+}
+
+.Input{
+    border: 5px solid rgb(0, 0, 0);
+}
+
+.Game-Info{
+    display: grid;
+    grid-template-columns: [points] 1fr [results] 1fr [startBtn] 1fr;
+    border: 5px solid rgb(54, 194, 36); 
+}
+
+
+
 
