@@ -47,43 +47,16 @@ class App extends React.Component{
         </Router>
         <footer className="App-footer">
           <button 
+            className="Home-button"
             onClick={(e) => {
               e.preventDefault();
               window.location.href='http://localhost:3000/';
             }} 
             type="button">
-            Home!
+            Home
           </button>
         </footer>
       </div>
-      /*
-      <div className="App">
-        <header className="App-header"> GamesHub! 
-        </header>
-          <Router>
-            <Switch>
-            <Route exact path="/">
-              <Home />
-            </Route>
-            <Route path="/Checkers">
-              <Checkers />
-            </Route>
-            </Switch>
-          </Router>
-  
-        <body className="App-body"></body>
-        <footer className="App-footer">
-          <button 
-            onClick={(e) => {
-              e.preventDefault();
-              window.location.href='http://localhost:3000/';
-            }} 
-            type="button">
-            Home!
-          </button>
-        </footer>
-      </div>
-      */
     )
   }
 }

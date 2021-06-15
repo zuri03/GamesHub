@@ -12,26 +12,16 @@ function Home(props){
                     type="button">
                     Checkers!
                 </button>
-        </div>
-    );
-    /*
-    return(
-        <div className="Container">
-            <div className="Checkers-link">
-                <div className="Checkers-desc">
                 <button 
                     onClick={(e) => {
                         e.preventDefault();
-                        window.location.href='http://localhost:3000/Checkers';
+                        window.location.href='http://localhost:3000/WordSolver';
                     }} 
                     type="button">
-                    Checkers!
+                    Word Solver!
                 </button>
-                </div>
-            </div>
         </div>
-    )
-    */
+    );
 }
 
 export default Home;
