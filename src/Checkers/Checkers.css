@@ -67,16 +67,14 @@
     border: 1px solid rgb(179, 13, 13);
 }
 .Checkers-blackSpace {
-    
-    padding: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     background: rgb(0, 0, 0);
-    float: center;
     line-height: 34px;
     height: 65px;
     margin-right: -1px;
     margin-top: -1px;
-    padding: 0;
-    text-align: center;
     width: 65px;
     color: rgb(179, 13, 13);
     border: 1px solid rgb(179, 13, 13);

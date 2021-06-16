@@ -123,7 +123,7 @@ class WordSolver extends React.Component{
             let add = this.state.points + (100 * this.pointsBoost);
             this.setPoints(add); 
             
-            let newBoost = this.pointsBoost + 1;
+            let newBoost = this.pointsBoost + 0.5;
             this.pointsBoost = newBoost;
             
         } else {
@@ -188,6 +188,7 @@ class WordSolver extends React.Component{
         
         let seconds = this.state.seconds - 1;
         let newTime = this.secondsToTime(seconds);
+
         this.setState({
           time: newTime,
           seconds: seconds,
