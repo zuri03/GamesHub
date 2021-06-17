@@ -8,7 +8,7 @@ import {
 import './App.css';
 import Checkers from './Checkers/Checkers.js';
 import WordSolver from './WordSolver/WordSolver.js';
-import Home from './Home.js';
+import Home from './Home/Home.js';
 import React from "react";
 
 const img = "https://www.seekpng.com/png/detail/232-2328978_icon-checkers-icon.png";

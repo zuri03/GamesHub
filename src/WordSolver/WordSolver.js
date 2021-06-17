@@ -194,7 +194,7 @@ class WordSolver extends React.Component{
           seconds: seconds,
         });
 
-        if (seconds == 0) {
+        if (seconds === 0) {
 
             clearInterval(this.cancelTime);
 

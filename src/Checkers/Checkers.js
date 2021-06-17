@@ -50,9 +50,6 @@ class Board extends React.Component {
         };
 
         this.handleDoubleClick = this.handleDoubleClick.bind(this);
-        
-        var color = 0;
-        var pieceIndex = 0;
 
         class Space {
 
@@ -78,6 +75,9 @@ class Board extends React.Component {
 
             makeKing(){this.status = "KING";}
         }
+
+        var color = 0;
+        var pieceIndex = 0;
 
         for(var i = 0; i < this.state.spaces.length; i++){
 
