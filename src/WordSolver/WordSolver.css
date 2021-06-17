@@ -32,19 +32,19 @@
 }
 .Points{
     border-top: 5px solid rgb(0, 0, 0);
-    background: rgb(83, 97, 102);
+    background: rgb(32, 47, 75);
     font-size: 25px;
     font-weight: bold;
 }
 .Results{
     border-top: 5px solid rgb(0, 0, 0);
-    background: rgb(83, 97, 102);
+    background: rgb(32, 47, 75);
     font-size: 25px;
     font-weight: bold;
 }
 .Timer{
     border-top: 5px solid rgb(0, 0, 0);
-    background: rgb(83, 97, 102);
+    background: rgb(32, 47, 75);
     font-size: 25px;
     font-weight: bold;
 }
@@ -62,14 +62,11 @@
 
 .Description{
     border-top: 5px solid rgb(0, 0, 0);
-    background: rgb(83, 97, 102);
+    background: rgb(32, 47, 75);
     font-weight: bold;
     margin-top: 20px; 
 }
-p{
-    font-size: 20px;
-    text-align: left;  
-}
+
 
 
 

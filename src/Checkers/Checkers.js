@@ -1,3 +1,9 @@
+/*
+todo
+- refactor validatemove to simplify
+- refactor code for readability and remove warnings
+-fix error in validatemove
+*/
 import React from 'react';
 import './Checkers.css'
 
@@ -124,24 +130,29 @@ class Board extends React.Component {
         }  
     }
 
+    //Since different clicks can mean different things we need a function to handle individual clicks on a space
     async handleClick(id){
 
+        //First check if the player has just selected a piece to move
+        //If the player has picked a destination then this.state.start will not be null
         if(this.state.start === null){
 
             let piece = this.state.dictionary[id];
 
+            //Make sure the piece the player wants to move is valid
             if(this.props.isValidMove(id, null, null, piece)){
 
                 await this.setState({start: id});
-
             }   
         } else {
 
             //since set state is asynchronous it causes setstate to act weird, the await statement fixed that
             if(this.state.dictionary[id] === null){
                 
+                //Set the end state property
                 await this.setState({end: id, message: null});
 
+                //Make sure the move is valid if it is move the piece
                 if(this.props.isValidMove(this.state.start, this.state.end, this.state.dictionary[this.getDiagonalPiece()], this.state.dictionary[this.state.start])){
 
                     this.movePiece();
@@ -184,6 +195,7 @@ class Board extends React.Component {
         var udpatedSpace = this.state.spaces;
         var updatedDiction = this.state.dictionary;   
         
+        //Make the diagonal piece null to remove it
         if(Math.abs(endIndex[0] - startIndex[0]) > 1){
             this.state.dictionary[this.getDiagonalPiece()] = null;
         }
@@ -226,12 +238,15 @@ class Board extends React.Component {
         //generate a 2d array of JSX components  
         for(var i = 0; i <= 7; i++){
 
+            //create a new row array for every row
             let rowArray = []
 
             for(var j = 0; j <= 7; j++){
                 
+                //Get a space object from the state
                 let space = this.state.spaces[i][j];
 
+                //Check properties of space object and make JSX component based on properties
                 if(space.color === "WHITE"){
 
                     rowArray.push(
@@ -246,8 +261,10 @@ class Board extends React.Component {
 
                 } else {
 
+                    //Get a piece object from state
                     let piece = this.state.dictionary[space.id];;
 
+                    //If the space has a piece on it then we make a JSX object based on properties
                     if(piece !== null){
 
                         let isKing = piece.status === "KING" ? true : false;
@@ -266,6 +283,7 @@ class Board extends React.Component {
                         }
                     }
                     
+                    //Add space to row array
                     rowArray.push( 
                         <Space 
                             id={space.id}
@@ -294,7 +312,9 @@ class Board extends React.Component {
 }
 
 class Checkers extends React.Component {
+
     constructor(props){
+
         super(props);
 
         this.state = {
@@ -313,14 +333,17 @@ class Checkers extends React.Component {
     //When making a double jump if the player selects an piece other than jump piece an error occurs
     isValidMove(start, end, diagPiece, movingPiece) {
 
+        //First check if the player has already made a move this turn
         if(this.state.jumpingPiece !== null){
- 
+            
+            //If the player selects a piece 'moving piece' that is not the same piece as the one already moved return false
             if(this.state.jumpingPiece !== movingPiece.id){
 
                 this.setMessage("ONLY ALLOWED TO MAKE ANY AVAILABLE DOUBLE JUMPS");
                 return false;
             }
 
+            //If the player tries to make a second move that is not another jump return false
             if(diagPiece === null && end !== null){
 
                 this.setMessage("ONLY ALLOWED TO MAKE ANY AVAILABLE DOUBLE JUMPS");
@@ -330,10 +353,13 @@ class Checkers extends React.Component {
 
         let isValidMove;
 
+        //Check if the player has choosen a destination
         if(end !== null){
 
+            //Check if the piece is a king piece normal pieces can only move forward
             if(movingPiece.status !== "KING"){
 
+                //Based on the color of the piece the difference between the start and end row will be positive or negative
                 if(movingPiece.pieceColor === "RED"){
 
                     if((start[0] - end[0]) > 0){
@@ -366,17 +392,20 @@ class Checkers extends React.Component {
                                 ((Math.abs(end[0] - start[0]) === 2) && (Math.abs(end[2] - start[2])) === 2) &&
                                     (diagPiece.pieceColor !== this.state.currentTurn);
 
+                //If the jump move is valid then removed an opponent's piece
                 if(isValidMove){
                     
                     this.removePiece(diagPiece.pieceColor); 
                 }
             } 
 
+            //set the moving piece id to jumping piece in state so we can track to make sure the player only makes a double jump with the same piece
             if(isValidMove){
 
                 let id = movingPiece.id;
                 this.setState({jumpingPiece: id});
 
+                //Also check if there is a winner
                 this.findWinner();
 
             } else {
@@ -387,12 +416,14 @@ class Checkers extends React.Component {
             return isValidMove; 
         }
 
+        //If the player has not picked a destination then just make sure that they have picked a space with a piece on it
         if(movingPiece === null){
 
             this.setMessage("MUST SELECT A PIECE TO MOVE");
             return false;
         }
         
+        //If the player has not picked a destination then make sure that the piece they have selected is not an opponent's piece
         isValidMove = movingPiece.pieceColor === this.state.currentTurn;
 
         if(!isValidMove){

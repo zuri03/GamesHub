@@ -90,6 +90,7 @@
     display: grid;
     grid-template-rows: [firstRow] 200px [secondRow] auto [thirdRow] 200px;
     border: 5px solid rgb(179, 13, 13);
+    background-color: rgb(32, 42, 75);
 }
 .Checkers-turn {
 grid-row-start: span [firstRow];
@@ -109,11 +110,13 @@ border: 5px solid rgb(179, 13, 165)
 }
 .Checkers-endTurn {
 grid-row-start: span [thirdRow];
+color: white;
 border-radius: 25px;
 font-size: 35px;
 font-family: monospace;
 text-align: center;
-border: 5px solid rgb(179, 13, 165)
+border: 5px solid rgb(179, 13, 165);
+background-color: rgb(32, 42, 75);
 }
 .Checkers-game{
 display: grid;

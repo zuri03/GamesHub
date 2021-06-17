@@ -25,7 +25,6 @@ class App extends React.Component{
     this.setState({mess: "New"})
   }
   render(){
-    
     return (
       <div className="App">
         <header className="App-header"> GamesHub! 
