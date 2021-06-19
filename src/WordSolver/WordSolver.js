@@ -45,7 +45,6 @@ class WordSolver extends React.Component{
         this.startGame = this.startGame.bind(this);
         this.secondsToTime = this.secondsToTime.bind(this);
         this.countDown = this.countDown.bind(this);
-        this.state.time = this.secondsToTime(this.state.seconds);
     }
 
     async checkWord(event){
@@ -261,13 +260,9 @@ class WordSolver extends React.Component{
 
         let timer;
         
-        if(!this.state.hasStarted){
-            
-            timer = <button className="Start" onClick={this.startGame}>START!</button>   
-        } else {
-            
-            timer = <div className="Start">{this.state.time.m} : {this.state.time.s}</div>   
-        } 
+        !this.state.hasStarted ? 
+            timer = <button className="Start" onClick={this.startGame}>START!</button> :
+            timer = <div className="Start">{this.state.time.m} : {this.state.time.s}</div>
 
         return(
             <div className="Word-solver">
@@ -279,7 +274,7 @@ class WordSolver extends React.Component{
                 <div className="Input">
                     <form onSubmit={(e) => this.checkWord(e)}>
                         <label>Word:
-                            <input type="text" value={this.state.checkedWord} onChange={this.handleChange} name="name" />
+                            <input type="text" value={this.state.checkedWord} onChange={this.handleChange} name="name" placeholder="Enter Here" />
                         </label>
                         <input type="submit" value="Submit" />
                     </form>
@@ -294,13 +289,6 @@ class WordSolver extends React.Component{
                     <div className="Timer">
                         {timer}
                     </div>
-                </div>
-                <div className="Description">
-                    <p className="word">Press start the begin the game</p>
-                    <p className="word">Every correct word will add 100 points to your score</p>
-                    <p className="word">Submitting multiple correct words in a row will increase the points booster!</p>
-                    <p className="word">Submitting an incorrect word will reset the booster and subtract 100 points</p>
-                    <p className="word">You have 3 minutes to guess as many words as possible, Good Luck!</p>
                 </div>
             </div>
         )

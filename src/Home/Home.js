@@ -20,7 +20,7 @@ function Home(props){
                         <br/>
                         AI player coming soon!
                         <br/>
-                        Tools: React, HTML, Javascript, CSS
+                        Tools: React, HTML, Javascript, CSS, Node.js
                     </p> 
                     <button className="gameLink"
                         onClick={(e) => {
@@ -34,7 +34,7 @@ function Home(props){
                 <div className="WordSolver-link">
                     <img
                         src="https://words-solver.com/wp-content/uploads/2020/09/words-solver-1200x1630-1.png"
-                        width="572px"
+                        width="527px"
                         height="190px"
                     />
                     <h1>Word Solver!</h1>
@@ -47,7 +47,7 @@ function Home(props){
                         <br/>
                         Built using meriam dictionary API
                         <br/>
-                        Tools: React, HTML, Javascript, CSS
+                        Tools: React, HTML, Javascript, CSS, Node.js
                     </p> 
                     <button className="gameLink"
                         onClick={(e) => {

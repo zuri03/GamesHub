@@ -7,7 +7,7 @@ todo:
 .Container{
     display: grid;
     grid-template-columns: [firstCol] 1fr [secondCol] 1fr;
-    grid-template-rows: [firstRow] 470px [secondRow] 10px;
+    grid-template-rows: [firstRow] auto [secondRow] 10px;
     row-gap: 20px;
     column-gap: 20px;
     padding-left: 100px;
