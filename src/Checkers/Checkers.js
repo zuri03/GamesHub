@@ -50,7 +50,7 @@ class Board extends React.Component {
             spaces : Array(8).fill(null).map(() => rows.slice()),
             start: null,
             end: null,
-            message: "SELECT A PIECE",
+            message: "SELECT PIECE",
             dictionary: {},
 
         };
