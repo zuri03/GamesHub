@@ -1,0 +1,83 @@
+.Letter-display{
+    margin-top: 20px;
+    overflow: auto;
+    display: grid;
+    column-gap: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+    grid-template-columns: repeat(8, [letter] 1fr);
+}
+
+.Single-Letter{
+    padding-top: 20px;
+    font-weight: bold;
+    border-radius: 5px;
+    width: inherit;
+    height: 80px;
+    border: 2px solid rgb(0, 0, 0);
+    background: rgb(73, 73, 73);
+    font-size: 40px;
+    text-align: center;
+}
+
+.Word-Solver{
+    border: 5px solid rgb(13, 113, 179);
+    display: grid;
+    grid-template-rows: [letters] 1fr [input] 1fr [gameInfo] 1fr;
+    row-gap: 50px;
+}
+
+.Input{
+    margin-top: 20px;
+    font-size: 15px;
+    height: 150px;
+    align-content: center;
+    justify-content: center;
+}
+
+.Points{
+    border-top: 5px solid rgb(0, 0, 0);
+    background: rgb(32, 47, 75);
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.Results{
+    border-top: 5px solid rgb(0, 0, 0);
+    background: rgb(32, 47, 75);
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.Timer{
+    border-top: 5px solid rgb(0, 0, 0);
+    background: rgb(32, 47, 75);
+    font-size: 25px;
+    font-weight: bold;
+    color: inherit;
+}
+.Game-Info{
+    margin-top: 20px; 
+    display: grid;
+    grid-template-columns: [points] 1fr [results] 1fr [startBtn] 1fr; 
+    grid-template-rows: [firstRow] 200px;
+    column-gap: 10px;
+    color: whitesmoke
+}
+.Start{
+    background-color: inherit;
+    align-self: stretch;
+    font-size: 25px;
+    color: inherit;
+}
+
+.Description{
+    border-top: 5px solid rgb(0, 0, 0);
+    background: rgb(32, 47, 75);
+    font-weight: bold;
+    margin-top: 20px; 
+}
+
+input{
+    border: 2px solid rgb(73, 73, 73);
+}

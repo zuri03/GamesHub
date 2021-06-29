@@ -1,0 +1,67 @@
+
+
+.App {
+  text-align: center;
+  display: grid;
+  grid-template-rows: [header] 10vh [body] 90vh;
+}
+
+.App-body{
+  grid-row-start: span [body];
+  border-top: 3px solid rgb(255, 0, 0);
+}
+.App-footer {
+  grid-row-start: span [footer];
+  background-color: rgb(32, 47, 75);
+  border-top: 5px rgb(0, 0, 0);
+  min-height: 10vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  font-family: monospace;
+  color: white;
+}
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@keyframes example {
+  from {border: 10px solid rgb(179, 13, 13)}
+  to {border: 10px solid rgb(140, 0, 255)}
+}
+@keyframes showLink {
+  from {margin-top: 100%;}
+  to {margin-top: 0%;}
+}
+
+.App-header {
+  grid-row-start: span [header];
+  background-color: rgb(32, 47, 75);
+  display: grid;
+  grid-template-columns: [title] 1fr [home] 1fr;
+  min-height: 10vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+  filter: drop-shadow(0px 2px 10px rgb(32, 47, 75));
+}
+
+.App-link {
+  color: #61dafb;
+}
+.Checkers-logo{
+  max-height: 100px;
+  max-width: 100px;
+}
+
+.Home-button {
+  justify-self: right;
+  border-radius: 25px;
+  font-size: 25px;
+}
