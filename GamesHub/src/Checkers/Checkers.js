@@ -20,11 +20,11 @@ const Piece = ({color, id, isKing}) => {
     if(isKing){
         return (
             <button className={color} key={id}>
-                    <img 
-                        src="https://toppng.com/uploads/preview/king-crown-transparent-115525054964mmviw8x6l.png"
-                        width="20"
-                        height="20"
-                    />
+                <img 
+                    src="https://toppng.com/uploads/preview/king-crown-transparent-115525054964mmviw8x6l.png"
+                    width="20"
+                    height="20"
+                />
             </button>
         );
     } else {
@@ -131,7 +131,12 @@ class Checkers extends React.Component {
 
     async switchTurn(){
 
-        await fetch("http://localhost:9000/CheckersServ/switchTurn").then(res => {
+        await fetch("http://localhost:9000/CheckersServ/switchTurn", {
+
+            mode : "cors",
+            method : 'POST',
+
+        }).then(res => {
 
             console.log(res);
 
@@ -155,9 +160,6 @@ class Checkers extends React.Component {
             return res.json();
 
         }).then(res => {
-
-            console.log(`Server has returned ${res}`);
-            console.log(`Initial Type ${typeof res}`);
 
             this.setState({
                 board : res,
@@ -185,16 +187,44 @@ class Checkers extends React.Component {
         }).then(res => {
 
             console.log(res);
-            return res.text(); 
+            return res.json();
 
-        }).then(text => {
+        }).then(res => {
 
-            this.setMessage(text);
+            this.setMessage(res.message);
+            this.getBoard();
             
         }).catch(error => {
 
             console.log(error);
-        })  
+        });
+    }
+
+    async getBoard(){
+
+        await fetch("http://localhost:9000/CheckersServ/getCheckers", {
+
+            headers : {
+                'Content-Type': 'application/json'
+            },
+            mode : "cors",
+            method : "GET"
+
+        }).then(res => {
+
+            return res.json();
+
+        }).then(json => {
+
+            this.setState({
+                board : json
+            })
+
+        }).catch(error => {
+
+            console.log(error);
+        })
+
     }
 
     handleDoubleClick(){
@@ -211,8 +241,7 @@ class Checkers extends React.Component {
 
     render(){
 
-        console.log("RENDERING")
-        console.log(`this.state.board type ${typeof this.state.board}`);
+        console.log("RENDERING");
 
         return (
             <div className="Checkers-game">

@@ -27,7 +27,7 @@ function App (props){
           Home
       </button> 
       </header>
-      <body className="App-body">
+      <div className="App-body">
       <Router>
           <Switch>
           <Route exact path="/">
@@ -41,7 +41,7 @@ function App (props){
           </Route>
           </Switch>
       </Router>
-      </body>
+      </div>
     </div>
   )
 }

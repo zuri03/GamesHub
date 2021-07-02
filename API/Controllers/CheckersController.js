@@ -1,14 +1,17 @@
 var Checkers = require('./CheckersModel');
 
+var game = null;
+
 // Display detail page for a specific Genre.
 exports.startCheckers = function(req, res) {
 
-    console.log("START WAS CALLED");
+    console.log("I HATE THIS");
 
     try{
 
-        Checkers.startGame();
-        let board = Checkers.getBoard();
+        game = new Checkers();
+        game.startGame();
+        let board = game.getBoard();
         res.json(board);
 
     } catch(error) {
@@ -23,7 +26,7 @@ exports.getCheckers = function(req, res) {
     console.log("GET CHECKERS WAS CALLED");
     try{
 
-        let board = Checkers.getBoard().toString();
+        let board = game.getBoard();
         res.json(board);
 
     } catch(error) {
@@ -40,8 +43,9 @@ exports.handleClick = function(req, res) {
     try{
 
         console.log(req.body["id"]);
-        let response = Checkers.handleClick(req.body["id"]);
-        res.send(response);
+        let response = game.handleClick(req.body["id"]);
+        console.log(`response ${response.message}`);
+        res.json(response);
 
     } catch(error) {
 
@@ -52,12 +56,15 @@ exports.handleClick = function(req, res) {
 
 exports.handleDoubleClick = function(req, res) {
 
-    let response = Checkers.resetSelected();
+    let response = game.resetSelected();
     res.send(response);
 }
 
 exports.switchTurn = function(req, res) {
 
-    Checkers.switchTurn();
-    res.send("True");
+    console.log("SWITCH TURN CALLED")
+
+    let response = game.switchTurn();
+    console.log(`Turn is now ${response}`);
+    res.send(response);
 }

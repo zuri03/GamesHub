@@ -34,7 +34,7 @@ class Board{
         const rows = Array(8).fill(null);
 
         this.board = Array(8).fill(null).map(() => rows.slice())
-        this.turn = "WHTE";
+        this.turn = "WHITE";
         this.whitePieces = 12;
         this.redPieces = 12;
         this.jumpingPiece = null;
@@ -88,26 +88,30 @@ class Board{
         
         if(this.start === null){
 
-            if(this.isValidMove(id, null)){
+            let result = this.isValidController(id, null);
+
+            if(result.isValidMove){
 
                 this.start = id;
-                return true;
+                return result
 
             } else {
 
-                return false;
+                return result;
             }
             
         } else {
 
-            if(this.isValidMove(this.start, id)){
+            let result = this.isValidController(this.start, id);
+
+            if(result.isValidMove){
 
                 this.end = id;
-                return true;
+                return result
 
             } else {
 
-                return false;
+                return result
             }
         }  
     }
@@ -118,94 +122,153 @@ class Board{
         this.end = null;
     }
 
-    isValidMove(start, end) {
+    isValidMove(start, end, movingPiece){
 
-        let returnObj = {
+        console.log(`jumping piece is ${this.jumpingPiece}`);
+        let result = {
 
             isValidMove : false,
             message : "INVALID MOVE"
         }
 
-        let movingPiece = this.board[start[0]][start[2]];
-
         if(this.checkIfWhiteSpace(start, end)){
 
-            return returnObj;
+            returnObj.message = "NOT ALLOWED TO MOVE TO WHITE SPACE";
+            return result;
         }
 
         if(this.isOpponentPiece(movingPiece)){
 
-            return returnObj;
+            returnObj.message = "YOU CANNOT MOVE AN OPPONENT'S PIECE";
+            return result;
         }
 
-        if(!this.enforceDoubleJumpisAvailable(movingPiece, start, end)){
+        if(this.enforceDoubleJumpifAvailable(movingPiece, start, end)){
 
-            return returnObj;
+            returnObj.message = "YOU HAVE ALREADY MOVED ONCE THIS TURN YOU MUST EITHER MAKE ANY AVAILABLE JUMP MOVES OR END YOUR TURN";
+            return result;
         }
 
-        if(movingPiece.status !== "KING" && !this.noBackwardsMovement(movingPiece)){
+        let coords = this.getDiagonalPiece(start, end);
+        let diagPiece = this.board[coords[0]][coords[1]].piece;
 
-            return returnObj;
+        if(movingPiece.status !== "KING" && !this.noBackwardsMovement(movingPiece, start, end)){
+
+            result.message = "YOU ARE NOT ALLOWED TO MOVE THAT PIECE BACKWARDS";
+            return result;
         }
 
-        if(end !== null){ 
+        if(diagPiece === null){
 
-            let coords = this.getDiagonalPiece(start, end);
-            let diagPiece = this.board[coords[0]][coords[1]];
+            console.log("DIAG PIECE IS NULL");
 
-            if(diagPiece === null){
-
-                returnObj.isValidMove = ((end[0] % 2 === 0 && end[2] % 2 === 0) || (end[0] % 2 !== 0 && end[2] % 2 !== 0)) &&  
-                                        (Math.abs(start[0] - end[0]) === 1 && Math.abs(start[2] - end[2]) === 1);
-            } else {
-
-                returnObj.isValidMove = ((end[0] % 2 === 0 && end[2] % 2 === 0) || (end[0] % 2 !== 0 && end[2] % 2 !== 0)) &&
-                                        ((Math.abs(end[0] - start[0]) === 2) && (Math.abs(end[2] - start[2])) === 2) &&
-                                        (diagPiece.pieceColor !== this.turn);
-
-                if(returnObj.isValidMove){
+            result.isValidMove = ((end[0] % 2 === 0 && end[2] % 2 === 0) || (end[0] % 2 !== 0 && end[2] % 2 !== 0)) &&  
+                                    (Math.abs(start[0] - end[0]) === 1 && Math.abs(start[2] - end[2]) === 1);
             
-                    this.removePiece(diagPiece.pieceColor); 
-                }
+        } else {
+
+            result.isValidMove = ((end[0] % 2 === 0 && end[2] % 2 === 0) || (end[0] % 2 !== 0 && end[2] % 2 !== 0)) &&
+                                    ((Math.abs(end[0] - start[0]) === 2) && (Math.abs(end[2] - start[2])) === 2) &&
+                                    (diagPiece.pieceColor !== this.turn);
+
+            if(result.isValidMove){
+        
+                this.removePiece(diagPiece.pieceColor); 
             }
         }
 
-        if(returnObj.isValidMove){
+        return result
 
-            this.movePiece(start, end);
-            this.jumpingPiece = movingPiece.id;
-            returnObj.message = "VALID MOVE";
+    }
+
+    isValidPiece(start, movingPiece){
+
+        let result = {
+
+            isValidMove : false,
+            message : "INVALID MOVE"
         }
 
-        if(this.findWinner){
+        if(this.checkIfWhiteSpace(start, null)){
 
-            returnObj.isValidMove = true;
-            returnObj.message = "WE HAVE A WINNER";
+            result.message = "NOT ALLOWED TO MOVE TO WHITE SPACE";
+            return result
         }
 
-        return returnObj;  
+        if(this.isOpponentPiece(movingPiece)){
+
+            result.message = "YOU CANNOT MOVE AN OPPONENT'S PIECE";
+            return result
+        }
+
+        result.isValidMove = true;
+        result.message = "VALID MOVE"
+        movingPiece.isSelected = true;
+
+        return result;
+    }
+
+    isValidController(start, end) {
+
+        var movingPiece = this.board[start[0]][start[2]].piece;
+
+        if(end === null){
+
+            return this.isValidPiece(start, movingPiece);
+
+        } else {
+
+            let result = this.isValidMove(start, end, movingPiece);
+
+            if(result.isValidMove){
+
+                this.movePiece(start, end, movingPiece);
+                this.jumpingPiece = movingPiece.id;
+                movingPiece.isSelected = false;
+                result.message = "VALID MOVE";
+                this.resetSelected();
+            }
+
+            if(this.findWinner()){
+
+                returnObj.isValidMove = true;
+                returnObj.message = "WE HAVE A WINNER";
+            }
+    
+            return result; 
+        } 
     }
 
     enforceDoubleJumpifAvailable(movingPiece, start, end){
 
         if(this.jumpingPiece !== null){
 
-            if(this.jumpingPiece === movingPiece.id){
+            console.log("JUMPING PIECE IS NOT NULL");
+
+            if(this.jumpingPiece !== movingPiece.id){
+
+                console.log("JUMPING PIECE IS EQUAL TO MOVING PIECE")
 
                 if(end !== null){
 
+                    console.log("END IS NOT NULL");
+
                     let diagPiece = this.getDiagonalPiece(start, end);
 
-                    if(diagPiece !== null){
-                        
-                        if(diagPiece.pieceColor !== movingPiece.pieceColor) {
+                    if(diagPiece === null){
 
+                        console.log("DIAG PIECE IS NULL")
+                        return true;
+                        
+                    } else {
+
+                        if(diagPiece.pieceColor === movingPiece.pieceColor) {
+
+                            console.log("DIAG PIECE DOES EQUAL MOVING PIECE");
                             return true;
                         }
                     }
                 }
-
-                return true;
             }
         } 
 
@@ -214,9 +277,9 @@ class Board{
 
     checkIfWhiteSpace(start, end){
         if(end === null) 
-            return this.board[start[0]][start[2]].color !== "WHITE";
+            return this.board[start[0]][start[2]].color === "WHITE";
         else 
-            return this.board[start[0]][start[2]].color !== "WHITE" && this.board[end[0]][end[2]].color !== "WHITE";
+            return this.board[start[0]][start[2]].color === "WHITE" && this.board[end[0]][end[2]].color === "WHITE";
     }
 
     findWinner(){  
@@ -244,11 +307,9 @@ class Board{
         return gapIndex;
     }
 
-    movePiece(start, end){
+    movePiece(start, end, movingPiece){
  
-        let movingPiece = this.board[start[0]][start[2]].piece; 
- 
-        if(Math.abs(endIndex[0] - startIndex[0]) > 1){
+        if(Math.abs(end[0] - start[0]) > 1){
 
             let coords = this.getDiagonalPiece(start, end);
             this.board[coords[0]][coords[1]] = null;
@@ -266,7 +327,7 @@ class Board{
         }                     
     }
 
-    noBackwardsMovement(movingPiece){
+    noBackwardsMovement(movingPiece, start, end){
 
         if(movingPiece.pieceColor === "RED"){
 
@@ -294,6 +355,8 @@ class Board{
     switchTurn(){ 
 
         this.turn === "WHITE" ? this.turn = "RED" : this.turn = "WHITE";
+        this.resetSelected();
+        return this.turn;
     }
 
     isOpponentPiece(movingPiece){
@@ -324,8 +387,10 @@ class Checkers {
     handleClick(id){
         return this.board.handleClick(id);
     }
+
+    switchTurn(){
+        return this.board.switchTurn();
+    }
 }
 
-var game = new Checkers();
-
-module.exports = game;
+module.exports = Checkers;
