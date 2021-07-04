@@ -120,11 +120,18 @@ class Board{
 
         this.start = null;
         this.end = null;
+
+        for(let i = 0; i < this.board.length; i++){
+
+            for(let j = 0; j < this.board[i].length; j++){
+
+                this.board[i][j].isSelected = false;
+            }
+        }
     }
 
     isValidMove(start, end, movingPiece){
 
-        console.log(`jumping piece is ${this.jumpingPiece}`);
         let result = {
 
             isValidMove : false,
@@ -133,19 +140,21 @@ class Board{
 
         if(this.checkIfWhiteSpace(start, end)){
 
-            returnObj.message = "NOT ALLOWED TO MOVE TO WHITE SPACE";
+            result.message = "NOT ALLOWED TO MOVE TO WHITE SPACE";
             return result;
         }
 
         if(this.isOpponentPiece(movingPiece)){
 
-            returnObj.message = "YOU CANNOT MOVE AN OPPONENT'S PIECE";
+            result.message = "YOU CANNOT MOVE AN OPPONENT'S PIECE";
             return result;
         }
 
         if(this.enforceDoubleJumpifAvailable(movingPiece, start, end)){
 
-            returnObj.message = "YOU HAVE ALREADY MOVED ONCE THIS TURN YOU MUST EITHER MAKE ANY AVAILABLE JUMP MOVES OR END YOUR TURN";
+            console.log("INVLAID DOUBLE JUMP")
+
+            result.message = "YOU HAVE ALREADY MOVED ONCE THIS TURN YOU MUST EITHER MAKE ANY AVAILABLE JUMP MOVES OR END YOUR TURN";
             return result;
         }
 
@@ -159,8 +168,6 @@ class Board{
         }
 
         if(diagPiece === null){
-
-            console.log("DIAG PIECE IS NULL");
 
             result.isValidMove = ((end[0] % 2 === 0 && end[2] % 2 === 0) || (end[0] % 2 !== 0 && end[2] % 2 !== 0)) &&  
                                     (Math.abs(start[0] - end[0]) === 1 && Math.abs(start[2] - end[2]) === 1);
@@ -189,16 +196,27 @@ class Board{
             message : "INVALID MOVE"
         }
 
-        if(this.checkIfWhiteSpace(start, null)){
+        if(this.jumpingPiece === null){
 
-            result.message = "NOT ALLOWED TO MOVE TO WHITE SPACE";
-            return result
-        }
+            if(this.checkIfWhiteSpace(start, null)){
 
-        if(this.isOpponentPiece(movingPiece)){
+                result.message = "NOT ALLOWED TO MOVE TO WHITE SPACE";
+                return result
+            }
 
-            result.message = "YOU CANNOT MOVE AN OPPONENT'S PIECE";
-            return result
+            if(this.isOpponentPiece(movingPiece)){
+
+                result.message = "YOU CANNOT MOVE AN OPPONENT'S PIECE";
+                return result
+            }
+
+        } else {
+
+            if(movingPiece.id !== this.jumpingPiece){
+
+                result.message = "ONLT ALLOWED TO MAKE DOUBLE JUMP WITH PIECE THAT HAS ALREADY MOVED"
+                return result
+            }
         }
 
         result.isValidMove = true;
@@ -224,7 +242,6 @@ class Board{
 
                 this.movePiece(start, end, movingPiece);
                 this.jumpingPiece = movingPiece.id;
-                movingPiece.isSelected = false;
                 result.message = "VALID MOVE";
                 this.resetSelected();
             }
@@ -243,32 +260,32 @@ class Board{
 
         if(this.jumpingPiece !== null){
 
-            console.log("JUMPING PIECE IS NOT NULL");
-
             if(this.jumpingPiece !== movingPiece.id){
 
-                console.log("JUMPING PIECE IS EQUAL TO MOVING PIECE")
+                return true;
+                
+            } else {
 
                 if(end !== null){
 
-                    console.log("END IS NOT NULL");
-
-                    let diagPiece = this.getDiagonalPiece(start, end);
+                    let coords = this.getDiagonalPiece(start, end);
+                    let diagPiece = this.board[coords[0]][coords[1]].piece;
 
                     if(diagPiece === null){
 
-                        console.log("DIAG PIECE IS NULL")
+                        console.log("DIAG PIECE IS NULL \n")
+                        console.log("returning true from double jump \n")
                         return true;
                         
                     } else {
 
                         if(diagPiece.pieceColor === movingPiece.pieceColor) {
 
-                            console.log("DIAG PIECE DOES EQUAL MOVING PIECE");
                             return true;
                         }
                     }
                 }
+
             }
         } 
 
@@ -317,6 +334,7 @@ class Board{
         
         this.board[end[0]][end[2]].piece = movingPiece;
         this.board[start[0]][start[2]].piece = null
+        movingPiece.isSelected = false;
 
         if(parseInt(end[0]) === 0 || parseInt(end[0]) === 7){
 
@@ -386,6 +404,10 @@ class Checkers {
 
     handleClick(id){
         return this.board.handleClick(id);
+    }
+
+    handleDoubleClick(id){
+        this.board.resetSelected();
     }
 
     switchTurn(){

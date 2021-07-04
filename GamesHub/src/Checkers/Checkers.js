@@ -229,7 +229,15 @@ class Checkers extends React.Component {
 
     handleDoubleClick(){
 
-        fetch("http://localhost:9000/CheckersServ/handleDoubleClick");
+        fetch("http://localhost:9000/CheckersServ/handleDoubleClick", {
+
+            headers : {
+                'Content-Type': 'application/json'
+            },
+            mode : "cors",
+            method : "POST"
+            
+        });
         this.setMessage("SELECT A PIECE");
     }
 

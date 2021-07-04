@@ -1,13 +1,10 @@
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
-var cookieParser = require('cookie-parser');
+//var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var cors = require("cors");
 
-
-var usersRouter = require('./routes/users');
-var homePage = require('./routes/Home');
 var checkers = require('./routes/CheckersRoute');
 
 
@@ -21,13 +18,11 @@ app.use(cors());
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
+//app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 //app.use(bodyParser.json());
 
 //routes
-app.use('/', homePage);
-app.use('/users', usersRouter);
 app.use('/CheckersServ', checkers);
 
 // catch 404 and forward to error handler
