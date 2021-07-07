@@ -1,4 +1,4 @@
-var Checkers = require('./CheckersModel');
+var Checkers = require('../Models/CheckersModel');
 
 var game = null;
 
@@ -40,6 +40,7 @@ exports.handleClick = function(req, res) {
     try{
 
         let response = game.handleClick(req.body["id"]);
+        console.log(req.body);
         res.json(response);
 
     } catch(error) {

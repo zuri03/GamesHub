@@ -1,4 +1,4 @@
-
+//Must refactor to simplify
 class Board{
     
     constructor(){
@@ -15,13 +15,12 @@ class Board{
 
         class Piece {
 
-            constructor(id, pieceColor, status, spaceCoords){
+            constructor(id, pieceColor, status){
 
                 this.id = id;
                 this.pieceColor = pieceColor;
                 this.status = status;
                 this.makeKing = this.makeKing.bind(this);
-                this.spaceCoords = spaceCoords;
                 this.isSelected = false;
             }
 
@@ -63,13 +62,13 @@ class Board{
 
                     if(i <= 2){
 
-                        piece = new Piece(pieceIndex, "RED", "NORMAL", coords);
+                        piece = new Piece(pieceIndex, "RED", "NORMAL");
                         this.board[i][j] = new Space(coords, piece, "BLACK");
                         pieceIndex++;
 
                     } else if (i >= 5) {
 
-                        piece = new Piece(pieceIndex, "WHITE", "NORMAL", coords);
+                        piece = new Piece(pieceIndex, "WHITE", "NORMAL");
                         this.board[i][j] = new Space(coords, piece, "BLACK");
                         pieceIndex++; 
 
@@ -125,7 +124,10 @@ class Board{
 
             for(let j = 0; j < this.board[i].length; j++){
 
-                this.board[i][j].isSelected = false;
+                let piece = this.board[i][j].piece;
+                if(piece !== null){
+                    piece.isSelected = false;
+                }
             }
         }
     }
@@ -194,6 +196,12 @@ class Board{
 
             isValidMove : false,
             message : "INVALID MOVE"
+        }
+
+        if(movingPiece === null){
+            
+            result.message = "Must Select A Space With A Piece"
+            return result;
         }
 
         if(this.jumpingPiece === null){
@@ -273,8 +281,6 @@ class Board{
 
                     if(diagPiece === null){
 
-                        console.log("DIAG PIECE IS NULL \n")
-                        console.log("returning true from double jump \n")
                         return true;
                         
                     } else {
@@ -339,7 +345,6 @@ class Board{
         if(parseInt(end[0]) === 0 || parseInt(end[0]) === 7){
 
             if(movingPiece.status !== "KING"){
-
                 movingPiece.makeKing();
             }
         }                     
@@ -350,14 +355,12 @@ class Board{
         if(movingPiece.pieceColor === "RED"){
 
             if((start[0] - end[0]) > 0){
-
                 return false;
             }
 
         } else {
 
             if((start[0] - end[0]) < 0){
-
                 return false;
             }
         }
@@ -366,19 +369,18 @@ class Board{
     }
 
     getBoard(){
-
         return this.board; 
     }
 
     switchTurn(){ 
 
         this.turn === "WHITE" ? this.turn = "RED" : this.turn = "WHITE";
+        this.jumpingPiece = null;
         this.resetSelected();
         return this.turn;
     }
 
     isOpponentPiece(movingPiece){
-
         return movingPiece.pieceColor !== this.turn;
     }
     

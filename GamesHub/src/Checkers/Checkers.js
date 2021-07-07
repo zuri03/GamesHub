@@ -36,6 +36,10 @@ const Piece = ({color, id, isKing}) => {
 
 const Board = ({board, handleClick, handleDoubleClick}) => {
 
+    useEffect(() => {
+        console.log("BOARD IS GOING TO UPDATED")
+    })
+
     if(board !== null){
         
        return board.map((row) => {
@@ -119,8 +123,6 @@ class Checkers extends React.Component {
         this.handleDoubleClick = this.handleDoubleClick.bind(this);
         this.switchTurn = this.switchTurn.bind(this);
         this.setMessage = this.setMessage.bind(this);
-
-        console.log("FINISHED CONSTRUCTION");
     }
 
     componentDidMount(){
@@ -136,41 +138,34 @@ class Checkers extends React.Component {
             mode : "cors",
             method : 'POST',
 
-        }).then(res => {
+        }).then(res => { 
 
-            console.log(res);
+            let turn = this.state.turn;
+            turn === "WHITE" ? turn = "RED" : turn = "WHITE";
+            this.setState({turn : turn});
 
-            let color;
-            this.state.turn === "WHITE" ? color = "RED" : color = "WHITE";
+            return res.json() 
+        
+        }).then(json=> { 
 
-            this.setState({ turn : color });
+            this.setState({board : json});
 
         }).catch(error => {
 
             console.log(error);
-        })
+        });
     }
 
     async startGame(){
 
-        console.log("START GAME CALLED");
-
-        await fetch("http://localhost:9000/CheckersServ").then(res => {
-
-            return res.json();
-
-        }).then(res => {
+        await fetch("http://localhost:9000/CheckersServ").then(res => { return res.json() }).then(res => {
 
             this.setState({
                 board : res,
                 hasStarted : true
             });
             
-        }).catch(error => {
-
-            console.log(error);
-            console.log(`error type : ${typeof this.state.board}`)
-        });
+        }).catch(error => { console.log(error) });
     } 
     
     async handleClick(id) {
@@ -184,12 +179,7 @@ class Checkers extends React.Component {
             method : 'POST',
             body : JSON.stringify({ id : id }) 
 
-        }).then(res => {
-
-            console.log(res);
-            return res.json();
-
-        }).then(res => {
+        }).then(res => { return res.json() }).then(res => {
 
             this.setMessage(res.message);
             this.getBoard();
@@ -210,26 +200,17 @@ class Checkers extends React.Component {
             mode : "cors",
             method : "GET"
 
-        }).then(res => {
+        }).then(res => { return res.json() }).then(json => {
 
-            return res.json();
+            this.setState({board : json})
 
-        }).then(json => {
-
-            this.setState({
-                board : json
-            })
-
-        }).catch(error => {
-
-            console.log(error);
-        })
+        }).catch(error => { console.log(error) })
 
     }
 
-    handleDoubleClick(){
+    async handleDoubleClick(){
 
-        fetch("http://localhost:9000/CheckersServ/handleDoubleClick", {
+        await fetch("http://localhost:9000/CheckersServ/handleDoubleClick", {
 
             headers : {
                 'Content-Type': 'application/json'
@@ -237,14 +218,20 @@ class Checkers extends React.Component {
             mode : "cors",
             method : "POST"
             
+        }).then(res => { return res.json(); }).then(json => {
+
+            this.setState({ board : json})
+
+        }).catch(error => {
+
+            console.log(error)
         });
+
         this.setMessage("SELECT A PIECE");
     }
 
     setMessage(message){
-        this.setState({
-            message : message
-        })
+        this.setState({message : message})
     }
 
     render(){

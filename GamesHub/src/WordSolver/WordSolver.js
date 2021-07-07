@@ -8,7 +8,7 @@ class WordSolver extends React.Component{
         super(props);
 
         this.state = {
-            letters: [],
+            letters : [],
             results: "",
             checkedWord: null,
             points: 0,
@@ -17,27 +17,11 @@ class WordSolver extends React.Component{
             hasStarted: false
         }
 
-        var chars = "abcdefghijklmnopqrstuvwxyz";
-        var vowels = "aeiou";
-
-        //Generate the random letters by starting with two vowels to ensure player does not end up with only consonants
-        this.state.letters.push(vowels.charAt(Math.floor(Math.random() * vowels.length)));
-        this.state.letters.push(vowels.charAt(Math.floor(Math.random() * vowels.length)));
-
-        //Generate six more random letters for a total of eight 
-        for(let i = 1; i <= 6; i++){
-            
-            this.state.letters.push(chars.charAt(Math.floor(Math.random() * chars.length)))
-        }
-
         //Cancel time is a variable returned by set interval that allows use to end the set interval method
         this.cancelTime = 0;
 
         //Points boost increases the amount of points for every correct word 
         this.pointsBoost = 1;
-
-        //An array of words the player has already used
-        this.submittedWords = [];
 
         this.handleChange = this.handleChange.bind(this);
         this.setResults = this.setResults.bind(this);
@@ -49,82 +33,29 @@ class WordSolver extends React.Component{
 
     async checkWord(event){
 
-        //Since the event comes from a form prevent default so we do not reload the page
         event.preventDefault();
 
         //First check if the game has started
         if(this.state.hasStarted){
-
-            //For now we assume the word is correct and run a series of checks to see if it is incorrect in any way
-            let isCorrect = true;
-
-            //For every character in the word the player has submitted
-            for(let i = 0; i < this.state.checkedWord.length; i++){
-
-                //If the player has submitted a character that was not randomly generated 
-                if(!this.state.letters.includes(this.state.checkedWord[i])){
-
-                    this.setResults("ONE OR MORE LETTERS ARE NOT CURRENTLY ALLOWED");
-                    isCorrect = false;
-                }
-
-                if(!isNaN(this.state.checkedWord[i])){
-
-                    this.setResults("ONLY LETTERS ALLOWED");
-                    isCorrect = false;
-                }
-
-                if(!(/[a-z]/).test(this.state.checkedWord[i])){
-
-                    this.setResults("NO PUNCUATION ALLOWED");
-                    isCorrect = false;
-                }
-            }
-
-            //Check if the player has submitted a word that has been previously submitted
-            if(this.submittedWords.find(element => element === this.state.checkedWord) !== undefined){
-
-                isCorrect = false;
-                this.setResults("YOU HAVE ALREADY SUBMITTED THIS WORD");
-            }
             
-            //If the word passes all of the checks it moves on to the final check
-            if(isCorrect){
+            await fetch("http://localhost:9000/WordSolverServ/submitWord", {
 
-                try{
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                mode : "cors",
+                method : 'POST',
+                body : JSON.stringify({ submittedWord : this.state.checkedWord })
 
-                    //Send a call to meriam API
-                    const response = await fetch(`https://www.dictionaryapi.com/api/v3/references/collegiate/json/${this.state.checkedWord}?key=3d9a89de-d4ee-44bc-b1ad-cd8b9f10e0c8`);
-                    
-                    let json = response.json();
-                    
-                    //This is a weird way to check if it is a correct word
-                    //However if the json contains a meta section then the word is a correct english word
-                    json.then((res) => {
-        
-                        if(res[0].meta === undefined){
-        
-                            this.setResults("NOT A WORD");
-                            isCorrect = false;
-                            this.incrementPoints(isCorrect)
-        
-                        } else {
-        
-                            this.setResults("CORRECT!");
-                            this.submittedWords.push(this.state.checkedWord);
-                            this.incrementPoints(isCorrect);
-                        }
-                                    
-                    }).catch((error) => {
-        
-                        console.log('res error: ' + error);
-                    });
-        
-                } catch(error) {
-        
-                    console.log(error);   
-                } 
-            }
+            }).then(res => { return res.text() }).then(text => {
+
+                text ? this.incrementPoints(true) : this.incrementPoints(false);
+
+            }).catch(error => {
+
+                console.log(error)
+            });
+           
         } else{
 
             this.setResults("MUST START GAME BEFORE YOU ENTER ANY WORDS");
@@ -188,16 +119,20 @@ class WordSolver extends React.Component{
         }  
     }
 
-    startGame(){
+    async startGame(){
 
-        this.setState({hasStarted : true});
+        this.setState({ hasStarted : true });
         this.startTimer();
+        
+        await fetch("http://localhost:9000/WordSolverServ/startGame").then(res => { return res.json() }).then(json => {
+
+            this.setState({ letters : json });
+
+        }).catch(error => console.log(error))
     }
 
     startTimer(){
 
-        //Create a time object, set it to the time property of state and start the timer with the set interval and countdown method
-        //The method will be executed every second
         let obj = this.secondsToTime(this.state.seconds);
         this.setState({time : obj});
         this.cancelTime = setInterval(this.countDown, 1000);
@@ -260,18 +195,26 @@ class WordSolver extends React.Component{
         !this.state.hasStarted ? 
             timer = <button className="Start" onClick={this.startGame}>START!</button> :
             timer = <div className="Start">{this.state.time.m} : {this.state.time.s}</div>
+        
+        let inputValue;
+
+        if (!this.state.checkedWord) {
+            inputValue = ""
+        } else {
+            inputValue = this.state.checkedWord
+        }
 
         return(
             <div className="Word-solver">
                 <div className="Letter-display">
                     {this.state.letters.map((letter) => {
-                        return <div className="Single-Letter">{letter.toUpperCase()}</div>
+                        return <div className="Single-Letter" key={`${Math.floor(Math.random() * 1000)}:${letter}`}>{letter.toUpperCase()}</div>
                     })}
                 </div>
                 <div className="Input">
                     <form onSubmit={(e) => this.checkWord(e)}>
                         <label>Word:
-                            <input type="text" value={this.state.checkedWord} onChange={this.handleChange} name="name" placeholder="Enter Here" />
+                            <input type="text" value={inputValue} onChange={this.handleChange} name="name" placeholder="Enter Here" />
                         </label>
                         <input type="submit" value="Submit" />
                     </form>

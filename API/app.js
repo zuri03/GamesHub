@@ -1,11 +1,11 @@
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
-//var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var cors = require("cors");
 
 var checkers = require('./routes/CheckersRoute');
+var wordSolver = require('./routes/WordSolverRoute');
 
 
 var app = express();
@@ -18,12 +18,11 @@ app.use(cors());
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-//app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-//app.use(bodyParser.json());
 
 //routes
 app.use('/CheckersServ', checkers);
+app.use('/WordSolverServ', wordSolver);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
